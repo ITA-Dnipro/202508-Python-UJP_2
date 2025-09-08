@@ -6,7 +6,8 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --no-cache-dir black pylint pylint-django pre-commit
+RUN pip install --no-cache-dir pylint pylint-django black
+
 
 COPY . .
 
