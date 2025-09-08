@@ -21,11 +21,13 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "daphne",
     "django.contrib.staticfiles",
 
     "rest_framework",
     "core",
     "users",
+    "communications",
 ]
 
 MIDDLEWARE = [
@@ -57,6 +59,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "MiniF.wsgi.application"
+ASGI_APPLICATION = "MiniF.asgi.application"
 
 if env("DATABASE_URL", default=""):
     DATABASES = {"default": env.db("DATABASE_URL")}
