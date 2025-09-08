@@ -1,0 +1,40 @@
+[MASTER]
+load-plugins = pylint_django
+ignore = migrations,venv,node_modules,static
+jobs = 0
+
+[MESSAGES CONTROL]
+# Корисне "ядро" (якість + стиль)
+enable = E0602,W0611,W0612,C0103,C0301,C0326,R0913,R0914,R0915,E1101
+# Шум прибираємо
+disable =
+    R0903,        # too-few-public-methods (дрібні класи в Django - норма)
+    C0114,        # missing-module-docstring
+    C0115,        # missing-class-docstring
+    C0116         # missing-function-docstring
+
+[FORMAT]
+# Узгоджено з Black
+max-line-length = 88
+indent-string = '    '
+
+[BASIC]
+# PEP 8 іменування
+good-names = i,j,k,_,pk,id
+variable-rgx = [a-z_][a-z0-9_]{2,30}$
+function-rgx = [a-z_][a-z0-9_]{2,30}$
+class-rgx = [A-Z][a-zA-Z0-9]+$
+const-rgx = ([A-Z_][A-Z0-9_]*)
+
+[TYPECHECK]
+# Django динамічні атрибути — менше фальшивих помилок
+ignored-modules = django.http,django.db
+ignored-classes = django.db.models
+
+[REPORTS]
+score = no
+
+[DESIGN]
+max-args = 5
+max-locals = 15
+max-statements = 50
