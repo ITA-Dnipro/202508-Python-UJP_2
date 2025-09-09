@@ -29,6 +29,9 @@ We are committed to delivering a platform that is not just a marketplace for ide
 ### Database schema
 ![image](https://drive.google.com/file/d/1HtgMkpSJAQqvdOcCvi3FVAqssm-1Ge8v/view?usp=sharing)
 
+### Database schema
+<img width="884" height="783" alt="Screenshot_db" src="https://github.com/user-attachments/assets/50575ba4-a772-4625-8ad3-a7343e90cea2" />
+
 ### Basic Epics
 
 0. **As a user of the platform**, I want the ability to represent both as a startup and as an investor company, so that I can engage in the platform's ecosystem from both perspectives using a single account.
