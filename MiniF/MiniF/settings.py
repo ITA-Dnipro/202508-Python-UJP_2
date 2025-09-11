@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     "core",
     "users",
     "communications",
+    "profiles",
+    "projects",
 ]
 
 MIDDLEWARE = [
