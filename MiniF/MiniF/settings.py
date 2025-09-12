@@ -23,11 +23,21 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "daphne",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
 
     "rest_framework",
+    "rest_framework.authtoken",
+
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+
     "core",
     "users",
     "communications",
+    "dashboard",
     "profiles",
     "projects",
 ]
@@ -40,6 +50,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "MiniF.urls"
@@ -97,3 +108,17 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = "users.UserProfile"
+SITE_ID = 1
+
+REST_AUTH = {
+    "REGISTER_SERIALIZER": "users.serializers.UserRegistrationSerializer",
+}
+
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "no-reply@example.com"
