@@ -17,6 +17,7 @@ class StartupProfile(models.Model):
         ("Cherkasy", "Cherkasy"),
         ("Chernihiv", "Chernihiv"),
         ("Chernivtsi", "Chernivtsi"),
+        ("Crimea", "Crimea"),
         ("Dnipro", "Dnipro"),
         ("Donetsk", "Donetsk"),
         ("Ivano-Frankivsk", "Ivano-Frankivsk"),

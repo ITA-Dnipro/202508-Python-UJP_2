@@ -4,6 +4,5 @@ from core.views import health
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/health/", health),
     path("api/profiles/", include("profiles.urls")),
 ]
