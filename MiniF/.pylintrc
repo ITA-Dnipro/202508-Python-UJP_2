@@ -1,29 +1,26 @@
 [MASTER]
-# Django plugin + ігнор згенерованого/непотрібного
 load-plugins = pylint_django
 ignore = migrations,venv,node_modules,static
 jobs = 0
 
-# Ініціалізація Django, щоб уникнути E5110 (django-not-configured)
+
 init-hook =
-    import os, sys; \
-    sys.path.append(os.getcwd()); \
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE','MiniF.settings'); \
-    import django; django.setup()
+    import os, sys
+    sys.path.append(os.getcwd())
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE','MiniF.settings')
+    import django
 
 [MESSAGES CONTROL]
-# Корисне ядро (стиль + реальні помилки/якість)
-enable = E0602,W0612,C0103,C0301,R0913,R0914,R0915,E1101
+
+enable = E0602,W0612,C0103,C0301,R0913,R0914,R0915,E1101,C0115,C0116
 
 disable =
-    R0903,        # too-few-public-methods
-    C0114,        # missing-module-docstring
-    C0115,        # missing-class-docstring
-    C0116,         # missing-function-docstring
+    R0903,        
+    C0114,        
     W0611
 
 [FORMAT]
-max-line-length = 88
+max-line-length = 120
 indent-string = '    '
 
 [BASIC]
