@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from users.models import UserProfile
-from profiles.models import StartupProfile
+from profiles.models import StartupProfile, Industry
 from projects.models import StartupProject
 
 # Register your models here.
@@ -24,3 +24,4 @@ class UserProfileAdmin(UserAdmin):
 
 admin.site.register(StartupProfile)
 admin.site.register(StartupProject)
+admin.site.register(Industry)
