@@ -13,6 +13,13 @@ services:
     depends_on:
       - db
 
+  lint:
+    build: .
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: bash -c "black . && pylint --load-plugins pylint_django communications/ core/ dashboard/ MiniF/ profiles/ projects/ users/"
+
   db:
     image: postgres:15
     volumes:
