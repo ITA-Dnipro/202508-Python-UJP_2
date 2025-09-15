@@ -1,5 +1,9 @@
 from rest_framework import serializers
 from .models import UserProfile
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
+from dj_rest_auth.serializers import LoginSerializer
+from profiles.models import StartupProfile, InvestorProfile
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -28,3 +32,32 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def save(self, request=None):
         return super().save()
+
+class CustomLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    role = serializers.ChoiceField(choices=["startup", "investor"])
+
+    def validate(self, data):
+        email = data["email"]
+        password = data["password"]
+        role = data["role"]
+
+        user = authenticate(username=email, password=password)
+        if not user:
+            raise serializers.ValidationError("Invalid credentials")
+
+        refresh = RefreshToken.for_user(user)
+        # 👇 додаємо ролі у клейми токена
+        refresh["role"] = role
+        refresh["email"] = user.email
+        refresh["uid"] = user.id
+        access = refresh.access_token
+        access["role"] = role
+        access["email"] = user.email
+        access["uid"] = user.id
+
+        return {
+            "refresh": str(refresh),
+            "access": str(access),
+        }
