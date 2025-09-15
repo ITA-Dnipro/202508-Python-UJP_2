@@ -3,8 +3,8 @@ from rest_framework.routers import DefaultRouter
 from .views import StartupProfileViewSet
 
 router = DefaultRouter()
-router.register(r'startup-profiles', StartupProfileViewSet, basename='startupprofile')
+router.register(r"startup-profiles", StartupProfileViewSet, basename="startupprofile")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

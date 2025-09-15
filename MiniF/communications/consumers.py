@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class ChatConsumer(AsyncWebsocketConsumer):
 
     permission_classes = [IsAuthenticated]
@@ -30,13 +31,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         - Joins the corresponding channel layer group.
         - Accepts the WebSocket connection.
         """
-        other_user_id = self.scope['url_route']['kwargs']['other_user_id']
+        other_user_id = self.scope["url_route"]["kwargs"]["other_user_id"]
         self.other_user = await self.get_user(other_user_id)
-        if not self.scope['user'].is_authenticated or not self.other_user:
+        if not self.scope["user"].is_authenticated or not self.other_user:
             await self.close()
             return
-        self.room = await self.get_or_create_chat_room(self.scope['user'], self.other_user)
-        self.room_group_name = f'chat_{self.room.id}'
+        self.room = await self.get_or_create_chat_room(self.scope["user"], self.other_user)
+        self.room_group_name = f"chat_{self.room.id}"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
@@ -56,10 +57,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         - Sends the message event to the room group.
         """
         data = json.loads(text_data)
-        message = data.get('message')
-        await self.save_message(self.room, self.scope['user'], self.other_user, message)
-        await self.channel_layer.group_send(self.room_group_name, {'type': 'chat_message', 'message': message,
-                                                                   'sender': self.scope['user'].username})
+        message = data.get("message")
+        await self.save_message(self.room, self.scope["user"], self.other_user, message)
+        await self.channel_layer.group_send(
+            self.room_group_name, {"type": "chat_message", "message": message, "sender": self.scope["user"].username}
+        )
 
     async def chat_message(self, event):
         """
@@ -68,7 +70,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         - Extracts the message from the event.
         - Sends the message to the WebSocket as JSON.
         """
-        await self.send(text_data=json.dumps({'message': event['message'], 'sender': event['sender']}))
+        await self.send(text_data=json.dumps({"message": event["message"], "sender": event["sender"]}))
 
     @database_sync_to_async
     def get_user(self, user_id):
@@ -77,12 +79,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_or_create_chat_room(self, user1, user2):
         try:
-            room = ChatRoom.objects.get_or_create(investor=user1 if 'Investor' in user1.roles else user2,
-                                                  startup=user2 if 'Startup' in user2.roles else user1)
+            room = ChatRoom.objects.get_or_create(
+                investor=user1 if "Investor" in user1.roles else user2,
+                startup=user2 if "Startup" in user2.roles else user1,
+            )
             return room[0]
         except IntegrityError:
-            return ChatRoom.objects.get(investor=user1 if 'Investor' in user1.roles else user2,
-                                        startup=user2 if 'Startup' in user2.roles else user1)
+            return ChatRoom.objects.get(
+                investor=user1 if "Investor" in user1.roles else user2,
+                startup=user2 if "Startup" in user2.roles else user1,
+            )
 
     @database_sync_to_async
     def save_message(self, room, sender, receiver, content):
