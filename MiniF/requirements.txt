@@ -1,4 +1,4 @@
-﻿asgiref==3.9.1
+asgiref==3.9.1
 Django==4.2.24
 django-environ==0.11.2
 djangorestframework==3.15.2
@@ -12,3 +12,6 @@ daphne==4.1.0
 dj-rest-auth
 django-allauth
 requests
+pylint==3.2.7
+pylint-django==2.6.1
+black==24.10.0
