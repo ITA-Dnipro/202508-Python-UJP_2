@@ -1,9 +1,6 @@
-from django.urls import path
-
-from . import views
-
+from django.urls import path, include
 
 urlpatterns = [
-    path("", views.index, name="index"),
-    path("<str:room_name>/", views.room, name="room"),
+    path('api/', include('communications.api_urls')),
+    # Інші URL
 ]
