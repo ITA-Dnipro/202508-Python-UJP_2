@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+from users.models import UserProfile
+
 
 class StartupProfile(models.Model):
     """
@@ -42,3 +44,13 @@ class StartupProfile(models.Model):
     location = models.CharField(max_length=50, choices=LOCATION_CHOICES)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(null=True, blank=True)
+
+class InvestorProfile(UserProfile):
+    class Meta:
+        proxy = True
+        app_label = "profiles"  # щоб було в цьому ж додатку
+        verbose_name = "Investor Profile"
+        verbose_name_plural = "Investor Profiles"
+
+    def is_investor(self):
+        return True
