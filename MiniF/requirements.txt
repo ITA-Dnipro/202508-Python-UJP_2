@@ -16,3 +16,4 @@ dj-rest-auth
 django-allauth
 requests
 djangorestframework-simplejwt==5.3.1
+
