@@ -7,5 +7,4 @@ urlpatterns = [
     path("api/", include("users.urls")),
     path("api/profiles/", include("profiles.urls")),
     path("chat/", include("communications.urls")),
-    path("api/profiles/", include("profiles.urls")),
 ]

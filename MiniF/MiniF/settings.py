@@ -90,6 +90,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
 LANGUAGE_CODE = env("LANGUAGE_CODE")
 TIME_ZONE = env("TIME_ZONE")
 USE_I18N = True

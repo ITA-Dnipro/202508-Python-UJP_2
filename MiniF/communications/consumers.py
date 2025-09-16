@@ -3,16 +3,16 @@ import json
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.db.utils import IntegrityError
-from rest_framework.permissions import IsAuthenticated
 from .models import ChatRoom, Message
-from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import InvalidToken, AuthenticationFailed
+from django.core.exceptions import ObjectDoesNotExist
+from users.models import UserProfile
 
-User = get_user_model()
+User = UserProfile
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
-
-    permission_classes = [IsAuthenticated]
     """
     WebSocket consumer for a chat room.
 
@@ -31,17 +31,43 @@ class ChatConsumer(AsyncWebsocketConsumer):
         - Joins the corresponding channel layer group.
         - Accepts the WebSocket connection.
         """
-        other_user_id = self.scope["url_route"]["kwargs"]["other_user_id"]
-        self.other_user = await self.get_user(other_user_id)
-        if not self.scope["user"].is_authenticated or not self.other_user:
+        query_string = self.scope["query_string"].decode()
+        token = None
+        for param in query_string.split("&"):
+            if param.startswith("token="):
+                token = param.split("=")[1]
+                break
+
+        if not token:
             await self.close()
             return
-        self.room = await self.get_or_create_chat_room(self.scope["user"], self.other_user)
+
+        try:
+            auth = JWTAuthentication()
+            validated_token = auth.get_validated_token(token)
+            user = await database_sync_to_async(auth.get_user)(validated_token)
+            self.scope["user"] = user
+        except (InvalidToken, AuthenticationFailed, ObjectDoesNotExist):
+            await self.close()
+            return
+
+        room_id = self.scope["url_route"]["kwargs"]["room_id"]
+        self.room = await self.get_room(room_id)
+        if not self.room:
+            await self.close()
+            return
+
+        # Асинхронна перевірка участі в кімнаті
+        is_participant = await self.is_user_participant()
+        if not is_participant:
+            await self.close()
+            return
+
         self.room_group_name = f"chat_{self.room.id}"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
-    async def disconnect(self, close_code):
+    async def disconnect(self, code):
         """
         Called when the WebSocket connection is CLOSED.
 
@@ -58,7 +84,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """
         data = json.loads(text_data)
         message = data.get("message")
-        await self.save_message(self.room, self.scope["user"], self.other_user, message)
+        receiver = await self.get_receiver()
+        await self.save_message(self.room, self.scope["user"], receiver, message)
         await self.channel_layer.group_send(
             self.room_group_name, {"type": "chat_message", "message": message, "sender": self.scope["user"].username}
         )
@@ -73,23 +100,69 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"message": event["message"], "sender": event["sender"]}))
 
     @database_sync_to_async
+    def get_room(self, room_id):
+        try:
+            return ChatRoom.objects.get(id=room_id)
+        except ChatRoom.DoesNotExist:
+            return None
+
+    @database_sync_to_async
+    def is_user_participant(self):
+        if not self.room:
+            return False
+        return self.scope["user"] in [self.room.investor, self.room.startup]
+
+    @database_sync_to_async
+    def get_receiver(self):
+        if not self.room:
+            return None
+        current_user = self.scope["user"]
+        return self.room.startup if current_user == self.room.investor else self.room.investor
+
+    @database_sync_to_async
     def get_user(self, user_id):
+        """
+        Handles broadcasting messages to WebSocket clients.
+
+        - Sends the message and sender information to the client as JSON.
+        """
         return User.objects.get(pk=user_id)
 
     @database_sync_to_async
     def get_or_create_chat_room(self, user1, user2):
+        """
+        Retrieves or creates a chat room between two users.
+
+        Args:
+            user1 (User): The first user.
+            user2 (User): The second user.
+
+        Returns:
+            ChatRoom: The existing or newly created chat room.
+        """
         try:
             room = ChatRoom.objects.get_or_create(
-                investor=user1 if "Investor" in user1.roles else user2,
-                startup=user2 if "Startup" in user2.roles else user1,
+                investor=user1,
+                startup=user2,
             )
             return room[0]
         except IntegrityError:
             return ChatRoom.objects.get(
-                investor=user1 if "Investor" in user1.roles else user2,
-                startup=user2 if "Startup" in user2.roles else user1,
+                investor=user1,
+                startup=user2,
             )
-
     @database_sync_to_async
     def save_message(self, room, sender, receiver, content):
-        Message.objects.create(room=room, sender=sender, receiver=receiver, content=content)
+        """
+        Saves a message to the database.
+
+        Args:
+            room (ChatRoom): The chat room where the message is sent.
+            sender (User): The sender of the message.
+            receiver (User): The receiver of the message.
+            content (str): The message content.
+
+        Returns:
+            Message: The created message object.
+        """
+        return Message.objects.create(room=room, sender=sender, receiver=receiver, content=content)
