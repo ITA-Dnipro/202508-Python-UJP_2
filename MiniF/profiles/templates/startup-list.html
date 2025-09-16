@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Startups</title>
+</head>
+<body>
+<h1>All Startups</h1>
+<ul>
+    {% for startup in startups %}
+        <li>
+            <a href="{% url 'startup_detail' startup.id %}">
+                {{ startup.company_name }} ({{ startup.location }}, {{ startup.industry_id.industry_name }})
+            </a>
+        </li>
+    {% empty %}
+        <li>No startups available.</li>
+    {% endfor %}
+</ul>
+</body>
+</html>
