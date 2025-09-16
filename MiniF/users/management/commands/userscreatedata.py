@@ -35,7 +35,7 @@ class Command(BaseCommand):
             username = faker.unique.user_name()
             user_phone = "380" + str(faker.random_number(digits=9, fix_len=True))
             date_joined = make_aware(faker.date_time_this_decade())
-            updated_at = make_aware(faker.date_time_between(start_date=date_joined))
+            updated_at = make_aware(faker.date_time_between(start_date=date_joined, end_date="now"))
 
             user = User(
                 email=email,
@@ -47,7 +47,6 @@ class Command(BaseCommand):
                 updated_at=updated_at
             )
             user.set_password(password)
-            user.save()
 
             try:
                 user.save()

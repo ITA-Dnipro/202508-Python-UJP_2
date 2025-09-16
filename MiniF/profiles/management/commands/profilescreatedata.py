@@ -29,18 +29,21 @@ class Command(BaseCommand):
             self.stderr.write("No users found! Please create some users first.")
             return
 
+        # industry = list(StartupProfile.objects.values_list('industry_id', flat=True).distinct())
+        
         for _ in range(count):
-            user_id = random.choice(users).id
+            user_id=random.choice(users)
             company_name = faker.unique.company()
             description = faker.text(max_nb_chars=700)
             website = faker.url()
             industry_id = random.randint(1, 10)
+            # industry_id = random.choice(industry) if industry else ValueError("No industry IDs found in existing profiles.")
             location = random.choice([choice[0] for choice in StartupProfile.LOCATION_CHOICES])
             created_at = make_aware(faker.date_time_this_decade())
-            updated_at = make_aware(faker.date_time_between(start_date=created_at))
+            updated_at = make_aware(faker.date_time_between(start_date=created_at, end_date="now"))
 
             profile = StartupProfile(
-                user_id_id=user_id,
+                user_id=user_id,
                 company_name=company_name,
                 description=description,
                 website=website,
