@@ -21,10 +21,25 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "daphne",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
 
     "rest_framework",
+    "rest_framework.authtoken",
+
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+
     "core",
+    "users",
+    "communications",
+    "dashboard",
+    "profiles",
+    "projects",
 ]
 
 MIDDLEWARE = [
@@ -35,6 +50,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "MiniF.urls"
@@ -56,6 +72,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "MiniF.wsgi.application"
+ASGI_APPLICATION = "MiniF.asgi.application"
 
 if env("DATABASE_URL", default=""):
     DATABASES = {"default": env.db("DATABASE_URL")}
@@ -66,7 +83,14 @@ else:
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
+    },
+}
 LANGUAGE_CODE = env("LANGUAGE_CODE")
 TIME_ZONE = env("TIME_ZONE")
 USE_I18N = True
@@ -83,6 +107,21 @@ REST_FRAMEWORK = {
     "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
 }
 
+AUTH_USER_MODEL = "users.UserProfile"
+SITE_ID = 1
+
+REST_AUTH = {
+    "REGISTER_SERIALIZER": "users.serializers.UserRegistrationSerializer",
+}
+
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "no-reply@example.com"
 
 
 LOGGING = {
