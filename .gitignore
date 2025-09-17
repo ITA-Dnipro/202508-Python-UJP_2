@@ -13,6 +13,7 @@ __pycache__/
 *.sqlite3
 staticfiles/
 media/
+logs/project.log
 local_settings.py
 
 # OS generated files
