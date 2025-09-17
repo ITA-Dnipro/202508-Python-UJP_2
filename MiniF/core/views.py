@@ -9,7 +9,7 @@ def health(request):
     print("LOGGER LOADED:", logger)
     try:
         response = {"status": "ok", "app": "MiniF"}
-        logger.error(f"Response data: {response}")
+        logger.debug(f"Response data: {response}")
         return JsonResponse(response)
     except Exception as e:
         logger.error(f"Error in health endpoint: {e}", exc_info=True)
