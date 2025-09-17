@@ -151,6 +151,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 investor=user1,
                 startup=user2,
             )
+
     @database_sync_to_async
     def save_message(self, room, sender, receiver, content):
         """

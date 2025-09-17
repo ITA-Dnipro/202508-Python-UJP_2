@@ -16,7 +16,9 @@ class ChatRoom(models.Model):
     """
 
     class Meta:
-        unique_together = ["investor", "startup"]
+        constraints = [
+            models.UniqueConstraint(fields=["investor", "startup"], name="unique_investor_startup_room")
+        ]
 
     def __str__(self):
         return f"Room between {self.investor.username} and {self.startup.username}"

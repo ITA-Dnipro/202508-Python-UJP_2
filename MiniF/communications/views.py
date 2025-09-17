@@ -87,7 +87,7 @@ class ConversationViewSet(viewsets.ViewSet):
         """List all messages in a specific conversation"""
         try:
             room = self.get_queryset().get(id=pk)
-            messages = room.messages.all().order_by("created_at")
+            messages = room.messages.all().order_by("timestamp")
             serializer = MessageSerializer(messages, many=True)
             return Response(serializer.data)
         except ChatRoom.DoesNotExist:
