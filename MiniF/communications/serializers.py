@@ -13,9 +13,24 @@ class ChatRoomSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    sender = serializers.ReadOnlyField(source="sender.username")
-    receiver = serializers.ReadOnlyField(source="receiver.username")
+    sender_username = serializers.SerializerMethodField()
+    receiver_username = serializers.SerializerMethodField()
+    room_id = serializers.IntegerField()
 
     class Meta:
         model = Message
-        fields = ["id", "room", "sender", "receiver", "content", "timestamp"]
+        fields = ["id", "room_id", "sender_username", "receiver_username", "content", "timestamp"]
+
+    def get_sender_username(self, obj):
+        try:
+            user = UserProfile.objects.get(id=obj.sender_id)
+            return user.username
+        except UserProfile.DoesNotExist:
+            return None
+
+    def get_receiver_username(self, obj):
+        try:
+            user = UserProfile.objects.get(id=obj.receiver_id)
+            return user.username
+        except UserProfile.DoesNotExist:
+            return None

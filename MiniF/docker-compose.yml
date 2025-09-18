@@ -37,7 +37,16 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
-
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: 585662vcxz
+    volumes:
+      - mongodb_data:/data/db
 volumes:
   postgres_data:
   redis_data:
+  mongodb_data:

@@ -1,7 +1,8 @@
 from pathlib import Path
 import environ
-import os
 from datetime import timedelta
+import mongoengine
+from charset_normalizer.md__mypyc import exports
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -80,7 +81,7 @@ else:
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
-        }
+        },
     }
 CHANNEL_LAYERS = {
     "default": {
@@ -90,7 +91,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
-
+mongoengine.connect(host=env("MONGO_URI"))
 LANGUAGE_CODE = env("LANGUAGE_CODE")
 TIME_ZONE = env("TIME_ZONE")
 USE_I18N = True

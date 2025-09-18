@@ -2,12 +2,17 @@ import json
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
-from .models import ChatRoom, Message
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken, AuthenticationFailed
-from django.core.exceptions import ObjectDoesNotExist
 from users.models import UserProfile
+
+from MiniF.settings import env
+from .models import ChatRoom, Message
+from mongoengine import connect
+from pymongo.errors import PyMongoError
+import datetime
 
 User = UserProfile
 
@@ -22,6 +27,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     - Receiving messages from a WebSocket and broadcasting them to the group.
     - Receiving messages from the group and sending them back to the WebSocket.
     """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ініціалізація підключення до MongoDB
+        self.mongo_client = connect(db="mydatabase", host=env("MONGO_URI"))
+        self.db = self.mongo_client.mydatabase
 
     async def connect(self):
         """
@@ -57,7 +68,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
 
-        # Асинхронна перевірка участі в кімнаті
         is_participant = await self.is_user_participant()
         if not is_participant:
             await self.close()
@@ -74,6 +84,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         - Removes the current channel from the room group.
         """
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        if hasattr(self, "mongo_client"):
+            self.mongo_client.close()
 
     async def receive(self, text_data):
         """
@@ -166,4 +178,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Returns:
             Message: The created message object.
         """
-        return Message.objects.create(room=room, sender=sender, receiver=receiver, content=content)
+        try:
+            message = Message(
+                room_id=room.pk,
+                sender_id=sender.pk,
+                receiver_id=receiver.pk,
+                content=content,
+                timestamp=datetime.datetime.now(),
+            )
+            message.save()
+            if not message.id:
+                raise PyMongoError("Message not saved")
+        except PyMongoError as e:
+            print(f"MongoDB error: {e}")
+            raise

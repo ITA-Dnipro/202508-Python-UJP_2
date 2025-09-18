@@ -1,5 +1,7 @@
+from mongoengine import Document, DateTimeField, StringField, IntField
 from django.db import models
 from users.models import UserProfile
+import datetime
 
 
 class ChatRoom(models.Model):
@@ -16,24 +18,31 @@ class ChatRoom(models.Model):
     """
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=["investor", "startup"], name="unique_investor_startup_room")
-        ]
+        constraints = [models.UniqueConstraint(fields=["investor", "startup"], name="unique_investor_startup_room")]
 
     def __str__(self):
         return f"Room between {self.investor.username} and {self.startup.username}"
 
 
-class Message(models.Model):
+class Message(Document):
     """
     a model for messages in a conversation.
     """
 
-    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name="messages")
-    sender = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="sent_messages")
-    receiver = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="received_messages")
-    content = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+    room_id = IntField(required=True)
+    sender_id = IntField(required=True)
+    receiver_id = IntField(required=True)
+    content = StringField(required=True)
+    timestamp = DateTimeField(default=datetime.datetime.now)
+
+    meta = {
+        "indexes": [("room_id", "timestamp")],  # Додаємо композитний індекс
+    }
 
     def __str__(self):
-        return f"Message from {self.sender.username} to {self.receiver.username} at {self.timestamp}"
+        try:
+            sender = UserProfile.objects.get(id=self.sender_id)
+            receiver = UserProfile.objects.get(id=self.receiver_id)
+            return f"Message from {sender.username} to {receiver.username} at {self.timestamp}"
+        except UserProfile.DoesNotExist:
+            return f"Message with IDs (sender={self.sender_id}, receiver={self.receiver_id}) at {self.timestamp}"
