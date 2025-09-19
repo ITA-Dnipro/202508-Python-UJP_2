@@ -72,7 +72,6 @@ class ConversationViewSet(viewsets.ViewSet):
                 serializer = ChatRoomSerializer(room)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
-            # Create new conversation - assign current_user as investor and other_user as startup
             # TODO: Add proper role-based assignment when roles are implemented
             room = ChatRoom.objects.create(investor=current_user, startup=other_user)
 
