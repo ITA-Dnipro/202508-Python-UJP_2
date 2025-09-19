@@ -1,6 +1,6 @@
 [MASTER]
 load-plugins = pylint_django
-ignore = migrations,venv,node_modules,static
+ignore = migrations,venv,node_modules,static, tests
 jobs = 0
 
 
@@ -9,6 +9,7 @@ init-hook =
     sys.path.append(os.getcwd())
     os.environ.setdefault('DJANGO_SETTINGS_MODULE','MiniF.settings')
     import django
+    django.setup()
 
 [MESSAGES CONTROL]
 
