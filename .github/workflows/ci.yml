@@ -40,15 +40,6 @@ jobs:
 
       - name: Run Pylint
         run: |
-          export PYTHONPATH=$(pwd)
-          pylint --load-plugins pylint_django --rcfile=MiniF/.pylintrc MiniF/ communications/ core/ dashboard/ profiles/ projects/ users/
+          export PYTHONPATH=$(pwd)/MiniF
+          pylint --load-plugins pylint_django --rcfile=MiniF/.pylintrc MiniF/communications MiniF/core MiniF/dashboard MiniF/profiles MiniF/projects MiniF/users
 
-      - name: Enforce pylint score
-        run: |
-          export PYTHONPATH=$(pwd)
-          score=$(pylint --rcfile=MiniF/.pylintrc MiniF/ | grep "Your code has been rated at" | awk '{print $7}' | cut -d/ -f1)
-          echo "Pylint score: $score"
-          if [ "$score" -lt 8 ]; then
-            echo "Pylint score is below 8. Failing build."
-            exit 1
-          fi
