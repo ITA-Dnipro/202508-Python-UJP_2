@@ -11,6 +11,10 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DJANGO_SETTINGS_MODULE: MiniF.settings
+      PYTHONPATH: ${{ github.workspace }}
 
     steps:
       - name: Checkout repository
