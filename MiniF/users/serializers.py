@@ -1,8 +1,7 @@
 from rest_framework import serializers
-from .models import UserProfile
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from dj_rest_auth.serializers import LoginSerializer
+from .models import UserProfile
 from profiles.models import StartupProfile, InvestorProfile
 
 
@@ -30,34 +29,38 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             user_phone=validated_data.get("user_phone"),
         )
 
-    def save(self, request=None):
-        return super().save()
 
 class CustomLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
-    role = serializers.ChoiceField(choices=["startup", "investor"])
+    # головне: role НЕ обов’язкова
+    role = serializers.ChoiceField(choices=["startup", "investor"], required=False, allow_null=True)
 
     def validate(self, data):
-        email = data["email"]
-        password = data["password"]
-        role = data["role"]
+        email = data.get("email")
+        password = data.get("password")
+        role = data.get("role", None)
 
         user = authenticate(username=email, password=password)
         if not user:
             raise serializers.ValidationError("Invalid credentials")
 
+        # Якщо роль передана — перевіряємо, що відповідний профіль існує
+        if role == "startup" and not StartupProfile.objects.filter(user_id=user).exists():
+            raise serializers.ValidationError("User is not a startup.")
+        if role == "investor" and not InvestorProfile.objects.filter(user_id=user).exists():
+            raise serializers.ValidationError("User is not an investor.")
+
         refresh = RefreshToken.for_user(user)
-        # 👇 додаємо ролі у клейми токена
-        refresh["role"] = role
         refresh["email"] = user.email
         refresh["uid"] = user.id
+
         access = refresh.access_token
-        access["role"] = role
         access["email"] = user.email
         access["uid"] = user.id
 
-        return {
-            "refresh": str(refresh),
-            "access": str(access),
-        }
+        if role:
+            refresh["role"] = role
+            access["role"] = role
+
+        return {"refresh": str(refresh), "access": str(access)}
