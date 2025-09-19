@@ -11,7 +11,6 @@ from django.utils import timezone
 
 from MiniF.settings import env
 from .models import ChatRoom, Message
-from mongoengine import connect
 from pymongo.errors import PyMongoError
 
 User = UserProfile
