@@ -1,7 +1,7 @@
-from mongoengine import Document, DateTimeField, StringField, IntField
+from mongoengine import Document, DateTimeField, StringField, LongField
 from django.db import models
 from users.models import UserProfile
-import datetime
+from django.utils import timezone
 
 
 class ChatRoom(models.Model):
@@ -29,11 +29,11 @@ class Message(Document):
     a model for messages in a conversation.
     """
 
-    room_id = IntField(required=True)
-    sender_id = IntField(required=True)
-    receiver_id = IntField(required=True)
+    room_id = LongField(required=True)
+    sender_id = LongField(required=True)
+    receiver_id = LongField(required=True)
     content = StringField(required=True)
-    timestamp = DateTimeField(default=datetime.datetime.now)
+    timestamp = DateTimeField(default=timezone.now)
 
     meta = {
         "indexes": [("room_id", "timestamp")],  # Додаємо композитний індекс
@@ -41,8 +41,6 @@ class Message(Document):
 
     def __str__(self):
         try:
-            sender = UserProfile.objects.get(id=self.sender_id)
-            receiver = UserProfile.objects.get(id=self.receiver_id)
-            return f"Message from {sender.username} to {receiver.username} at {self.timestamp}"
+            return f"Message from {self.sender_id} to {self.receiver_id} at {self.timestamp}"
         except UserProfile.DoesNotExist:
             return f"Message with IDs (sender={self.sender_id}, receiver={self.receiver_id}) at {self.timestamp}"
