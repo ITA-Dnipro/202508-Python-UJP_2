@@ -1,6 +1,6 @@
 [MASTER]
 load-plugins = pylint_django
-ignore = migrations,venv,node_modules,static, tests
+ignore = migrations,venv,node_modules, static, tests
 jobs = 0
 
 
@@ -38,7 +38,7 @@ ignored-modules = django.http,django.db
 ignored-classes = django.db.models
 
 [REPORTS]
-score = no
+score = yes
 
 [DESIGN]
 max-args = 5
