@@ -1,11 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from users.models import UserProfile
-from profiles.models import StartupProfile
+from profiles.models import InvestorProfile, StartupProfile, Industry
 from projects.models import StartupProject
 
 
-# Register your models here.
 @admin.register(UserProfile)
 class UserProfileAdmin(UserAdmin):
     model = UserProfile
@@ -19,6 +18,7 @@ class UserProfileAdmin(UserAdmin):
 
     readonly_fields = ("updated_at",)
 
-
 admin.site.register(StartupProfile)
 admin.site.register(StartupProject)
+admin.site.register(Industry)
+admin.site.register(InvestorProfile)

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ startup.company_name }}</title>
+</head>
+<body>
+<h1>{{ startup.company_name }}</h1>
+<p><strong>Description:</strong> {{ startup.description }}</p>
+<p><strong>Industry:</strong> {{ startup.industry_id.industry_name }}</p>
+<p><strong>Location:</strong> {{ startup.location }}</p>
+<p><strong>Website:</strong>
+    {% if startup.website %}
+        <a href="{{ startup.website }}" target="_blank">{{ startup.website }}</a>
+    {% else %}
+        N/A
+    {% endif %}
+</p>
+<p><strong>Created at:</strong> {{ startup.created_at }}</p>
+<p><strong>Updated at:</strong> {{ startup.updated_at }}</p>
+
+<p><a href="{% url 'startup_list' %}">Back to list</a></p>
+</body>
+</html>
