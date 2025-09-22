@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from projects.models import StartupProject
 
 
 class Industry(models.Model):
@@ -103,3 +104,19 @@ class InvestorProfile(models.Model):
 
     def __str__(self):
         return self.company_name
+
+
+class SavedProject(models.Model):
+    """
+    Model for investor's saved startup projects.
+    """
+
+    investor = models.ForeignKey("profiles.InvestorProfile", on_delete=models.CASCADE)
+    project = models.ForeignKey(StartupProject, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["investor", "project"], name="unique_investor_project")]
+
+    def __str__(self):
+        return f"{self.investor} liked {self.project}"

@@ -1,6 +1,8 @@
-from rest_framework import viewsets, filters
-from .models import StartupProfile
-from .serializers import StartupProfileSerializer
+from rest_framework import viewsets, filters, generics, permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .models import StartupProfile, InvestorProfile, SavedProject
+from .serializers import StartupProfileSerializer, SavedProjectSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
@@ -54,3 +56,35 @@ def test_profile(request):
     except Exception as e:
         logger.error(f"Error in profiles/test_profile: {e}", exc_info=True)
         return JsonResponse({"error": "Internal server error"}, status=500)
+
+
+class SavedProjectListView(generics.ListAPIView):
+    """
+    List all projects saved by the authenticated investor.
+    """
+
+    serializer_class = SavedProjectSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        investor = get_object_or_404(InvestorProfile, user_id=self.request.user)
+        return SavedProject.objects.filter(investor=investor)
+
+
+class UnsaveProjectView(APIView):
+    """
+    API endpoint to remove a saved project for an investor.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, project_id):
+        investor = get_object_or_404(InvestorProfile, user_id=request.user)
+        project = get_object_or_404(StartupProject, id=project_id)
+
+        saved = SavedProject.objects.filter(investor=investor, project=project).first()
+        if not saved:
+            return Response({"detail": "Project not saved"}, status=status.HTTP_404_NOT_FOUND)
+
+        saved.delete()
+        return Response({"detail": "Project unsaved"}, status=status.HTTP_204_NO_CONTENT)

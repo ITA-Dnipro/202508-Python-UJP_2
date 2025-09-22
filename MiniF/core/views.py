@@ -4,6 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def health(request):
     logger.info("Health check endpoint was called")
     print("LOGGER LOADED:", logger)

@@ -4,6 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def test_project(request):
     logger.info("projects/test_project endpoint called")
     try:
