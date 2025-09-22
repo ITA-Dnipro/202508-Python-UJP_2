@@ -1,7 +1,8 @@
-from mongoengine import Document, DateTimeField, StringField, LongField
 from django.db import models
-from users.models import UserProfile
 from django.utils import timezone
+
+from users.models import UserProfile
+from mongoengine import Document, DateTimeField, StringField, LongField
 
 
 class ChatRoom(models.Model):

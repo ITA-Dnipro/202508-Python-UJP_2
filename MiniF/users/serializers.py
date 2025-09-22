@@ -49,7 +49,7 @@ class CustomLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid credentials")
 
         refresh = RefreshToken.for_user(user)
-        # 👇 додаємо ролі у клейми токена
+
         refresh["role"] = role
         refresh["email"] = user.email
         refresh["uid"] = user.id

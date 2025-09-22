@@ -1,9 +1,12 @@
 from rest_framework import serializers
+
 from .models import ChatRoom, Message
 from users.models import UserProfile
 
 
 class ChatRoomSerializer(serializers.ModelSerializer):
+    """Serializer for ChatRoom model with read-only investor and startup usernames."""
+
     investor = serializers.ReadOnlyField(source="investor.username")
     startup = serializers.ReadOnlyField(source="startup.username")
 
@@ -13,6 +16,8 @@ class ChatRoomSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
+    """Serializer for Message model with sender and receiver usernames."""
+
     sender_username = serializers.SerializerMethodField()
     receiver_username = serializers.SerializerMethodField()
     room_id = serializers.IntegerField()

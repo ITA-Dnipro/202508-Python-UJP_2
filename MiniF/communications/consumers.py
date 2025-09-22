@@ -1,18 +1,19 @@
 import json
+import datetime
+
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.utils import IntegrityError
+from django.utils import timezone
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import InvalidToken, AuthenticationFailed
+from pymongo.errors import PyMongoError
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.utils import IntegrityError
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.exceptions import InvalidToken, AuthenticationFailed
-from users.models import UserProfile
-from django.utils import timezone
 
+from users.models import UserProfile
 from MiniF.settings import env
 from .models import ChatRoom, Message
-from pymongo.errors import PyMongoError
-
 User = UserProfile
 
 
@@ -26,6 +27,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     - Receiving messages from a WebSocket and broadcasting them to the group.
     - Receiving messages from the group and sending them back to the WebSocket.
     """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.room = None
+        self.room_group_name = None
 
     async def connect(self):
         """
@@ -70,7 +76,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
-    async def disconnect(self, code):
+    async def disconnect(self, close_code):
         """
         Called when the WebSocket connection is CLOSED.
 
@@ -106,6 +112,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_room(self, room_id):
+        """Retrieve a chat room by ID."""
         try:
             return ChatRoom.objects.get(id=room_id)
         except ChatRoom.DoesNotExist:
@@ -113,12 +120,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def is_user_participant(self):
+        """Check if the user is a participant in the room."""
         if not self.room:
             return False
         return self.scope["user"] in [self.room.investor, self.room.startup]
 
     @database_sync_to_async
     def get_receiver(self):
+        """Get the receiver user based on the current user."""
         if not self.room:
             return None
         current_user = self.scope["user"]
@@ -182,5 +191,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
             message.save()
             if not message.id:
                 raise PyMongoError("Message not saved")
-        except PyMongoError:
-            raise
+        except PyMongoError as e:
+            raise PyMongoError(f"Failed to save message: {str(e)}")
