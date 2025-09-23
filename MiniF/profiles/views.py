@@ -1,12 +1,14 @@
-from rest_framework import viewsets, filters, generics, permissions, status
+from django.db import IntegrityError
+from rest_framework import viewsets, filters, generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import StartupProfile, InvestorProfile, SavedProject
 from .serializers import StartupProfileSerializer, SavedProjectSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
 import logging
+
+from projects.models import StartupProject
 
 logger = logging.getLogger(__name__)
 
@@ -47,15 +49,35 @@ def startup_detail(request, startup_id):
     return render(request, "startup-detail.html", context)
 
 
-def test_profile(request):
-    logger.info("profiles/test_profile endpoint called")
-    try:
-        response = {"status": "ok", "message": "Profile endpoint works"}
-        logger.debug(f"Response data: {response}")
-        return JsonResponse(response)
-    except Exception as e:
-        logger.error(f"Error in profiles/test_profile: {e}", exc_info=True)
-        return JsonResponse({"error": "Internal server error"}, status=500)
+class SaveProjectView(APIView):
+    """
+    Endpoint for saving a project for an investor.
+    """
+
+    def post(self, request):
+        investor_id = request.data.get("investor_id")
+        if not investor_id:
+            return Response({"detail": "investor_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        investor = get_object_or_404(InvestorProfile, id=investor_id)
+
+        project_id = request.data.get("project_id")
+        if not project_id:
+            return Response({"detail": "project_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        project = get_object_or_404(StartupProject, id=project_id)
+
+        try:
+            saved = SavedProject.objects.create(investor=investor, project=project)
+        except IntegrityError:
+            return Response({"detail": "Project already saved"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "detail": "Project saved",
+            "saved_project_id": saved.id,
+            "investor_id": investor.id,
+            "project_id": project.id
+        }, status=status.HTTP_201_CREATED)
 
 
 class SavedProjectListView(generics.ListAPIView):
@@ -64,10 +86,10 @@ class SavedProjectListView(generics.ListAPIView):
     """
 
     serializer_class = SavedProjectSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        investor = get_object_or_404(InvestorProfile, user_id=self.request.user)
+        investor_id = self.request.query_params.get("investor_id")
+        investor = get_object_or_404(InvestorProfile, id=investor_id)
         return SavedProject.objects.filter(investor=investor)
 
 
@@ -76,13 +98,19 @@ class UnsaveProjectView(APIView):
     API endpoint to remove a saved project for an investor.
     """
 
-    permission_classes = [permissions.IsAuthenticated]
+    def delete(self, request):
+        investor_id = request.query_params.get("investor_id")
+        if not investor_id:
+            return Response({"detail": "investor_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, project_id):
-        investor = get_object_or_404(InvestorProfile, user_id=request.user)
-        project = get_object_or_404(StartupProject, id=project_id)
+        investor = get_object_or_404(InvestorProfile, id=investor_id)
 
-        saved = SavedProject.objects.filter(investor=investor, project=project).first()
+        saved_project_id = request.query_params.get("saved_project_id")
+        if not saved_project_id:
+            return Response({"detail": "saved_project_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        saved = SavedProject.objects.filter(id=saved_project_id).first()
         if not saved:
             return Response({"detail": "Project not saved"}, status=status.HTTP_404_NOT_FOUND)
 

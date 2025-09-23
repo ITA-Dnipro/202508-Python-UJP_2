@@ -102,8 +102,8 @@ class InvestorProfile(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(null=True, blank=True, auto_now=True)
 
-    def __str__(self):
-        return self.company_name
+    # def __str__(self):
+    #     return self.company_name
 
 
 class SavedProject(models.Model):
