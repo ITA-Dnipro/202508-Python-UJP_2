@@ -14,6 +14,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from users.models import UserProfile
 from MiniF.settings import env
 from .models import ChatRoom, Message
+
 User = UserProfile
 
 
