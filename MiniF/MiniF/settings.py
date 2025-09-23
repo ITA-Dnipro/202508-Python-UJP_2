@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "dashboard",
     "profiles",
     "projects",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -115,9 +116,8 @@ REST_AUTH = {
 }
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

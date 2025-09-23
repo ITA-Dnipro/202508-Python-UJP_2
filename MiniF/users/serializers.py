@@ -3,6 +3,10 @@ from .models import UserProfile
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+    """
+    Serializer for registering a new user.
+    """
+
     password2 = serializers.CharField(write_only=True)
 
     class Meta:
@@ -28,3 +32,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def save(self, request=None):
         return super().save()
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for UserProfile model.
+    """
+
+    class Meta:
+        model = UserProfile
+        fields = ["id", "email", "first_name", "last_name", "user_phone"]
