@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-
+import logging
 
 def _get_role_from_request(request):
     """
@@ -36,3 +36,14 @@ class IsInvestorRole(BasePermission):
 
     def has_permission(self, request, view):
         return _get_role_from_request(request) == "investor"
+
+logger = logging.getLogger(__name__)
+
+class CustomPermission(BasePermission):
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            logger.warning(
+                f"Permission denied for unauthenticated user. IP: {request.META.get('REMOTE_ADDR')}"
+            )
+            return False
+        return True
