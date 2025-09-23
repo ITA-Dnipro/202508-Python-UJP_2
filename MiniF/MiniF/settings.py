@@ -2,7 +2,6 @@ from pathlib import Path
 import environ
 from datetime import timedelta
 import mongoengine
-from charset_normalizer.md__mypyc import exports
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
