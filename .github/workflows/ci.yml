@@ -36,14 +36,14 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install pylint pylint-django black
           if [ -f MiniF/requirements.txt ]; then pip install -r MiniF/requirements.txt; fi
 
       - name: Check code formatting with Black
-        run: black MiniF/ 
+        run: black MiniF/
 
       - name: Run Pylint
         run: |
           export PYTHONPATH=$(pwd)/MiniF
-          pylint --load-plugins=pylint_django --rcfile=MiniF/.pylintrc \
-          MiniF/core MiniF/users MiniF/projects MiniF/profiles MiniF/communications MiniF/dashboard
+          pylint --load-plugins=pylint_django --rcfile=MiniF/.pylintrc MiniF/communications MiniF/core MiniF/dashboard MiniF/profiles MiniF/projects MiniF/users
 
