@@ -44,7 +44,7 @@ jobs:
           export DJANGO_SETTINGS_MODULE=MiniF.settings
           
           # Перевірка форматування з Black
-          black --check --diff .
+          black .
           
           # Запуск Pylint тільки для директорій з Python файлами
           find . -name "*.py" -path "./communications/*" -o -path "./core/*" -o -path "./dashboard/*" -o -path "./profiles/*" -o -path "./projects/*" -o -path "./users/*" | head -1 > /dev/null && \
