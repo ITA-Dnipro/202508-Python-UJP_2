@@ -14,7 +14,7 @@ jobs:
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       DJANGO_SETTINGS_MODULE: MiniF.settings
-      PYTHONPATH: ${{ github.workspace }}
+      
 
     steps:
       - name: Checkout repository
@@ -43,6 +43,6 @@ jobs:
 
       - name: Run Pylint
         run: |
-          export PYTHONPATH=$(pwd) 
+          export PYTHONPATH=$(pwd)
           pylint --load-plugins pylint_django --rcfile=MiniF/.pylintrc MiniF/communications MiniF/core MiniF/dashboard MiniF/profiles MiniF/projects MiniF/users
 
