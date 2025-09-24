@@ -31,9 +31,9 @@ disable =
     W0221,  # arguments-differ (Django method overrides)
     W0237,  # arguments-renamed (Django method overrides)
     W1203,  # logging-fstring-interpolation
-    W0718  # broad-exception-caught
+    W0718,  # broad-exception-caught
     W1113,  # keyword-arg-before-vararg
-    W0223,  # abstract-method
+    W0223  # abstract-method
 [FORMAT]
 max-line-length = 120
 indent-string = '    '
