@@ -43,6 +43,6 @@ jobs:
 
       - name: Run Pylint
         run: |
-          export PYTHONPATH=$(pwd)/MiniF 
+          export PYTHONPATH=$(pwd)/MiniF/ 
           pylint --rcfile=MiniF/.pylintrc MiniF/
 
