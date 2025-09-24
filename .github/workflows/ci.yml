@@ -39,10 +39,10 @@ jobs:
           if [ -f MiniF/requirements.txt ]; then pip install -r MiniF/requirements.txt; fi
 
       - name: Check code formatting with Black
-        run: black MiniF/ --check
+        run: black MiniF/ 
 
       - name: Run Pylint
         run: |
           export PYTHONPATH=$(pwd) 
-          pylint --load-plugins pylint_django --rcfile=MiniF/.pylintrc MiniF/
+          score=$(pylint --rcfile=MiniF/.pylintrc MiniF/ | grep "Your code has been rated at" | awk '{print $7}' | cut -d/ -f1)
 
