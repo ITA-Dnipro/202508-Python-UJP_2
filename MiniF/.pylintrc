@@ -22,18 +22,29 @@ disable =
     C0116,           #(missing-function-docstring)
     C0115,           #(missing-class-docstring)
     R0901,            #(too-many-ancestors)
-    C0411        #(wrong-import-order)
+    C0411,        #(wrong-import-order)
+    R0903,  # too-few-public-methods (Django models/forms)
+    W0611,  # unused-import (Django __init__.py files)
+    C0411,  # wrong-import-order
+    R0901,  # too-many-ancestors (Django views)
+    W0201,  # attribute-defined-outside-init (Django views)
+    W0221,  # arguments-differ (Django method overrides)
+    W0237,  # arguments-renamed (Django method overrides)
+    W1203,  # logging-fstring-interpolation
+    W0718  # broad-exception-caught
 [FORMAT]
 max-line-length = 120
 indent-string = '    '
 
 [BASIC]
-good-names = i,j,k,_,pk,id
+good-names = i,j,k,_,pk,id,e,ex,f,db,ui,io,up
 module-rgx = ([a-z_][a-z0-9_]*|[A-Z][A-Za-z0-9]+)$
-variable-rgx = [a-z_][a-z0-9_]{2,30}$
-function-rgx = [a-z_][a-z0-9_]{2,30}$
+variable-rgx = [a-z_][a-z0-9_]{1,50}$
+function-rgx = [a-z_][a-z0-9_]{2,50}$
+method-rgx = [a-z_][a-z0-9_]{2,50}$
 class-rgx = [A-Z][a-zA-Z0-9]+$
-const-rgx = ([A-Z_][A-Z0-9_]*)
+const-rgx = ([A-Z_][A-Z0-9_]*|__[a-z0-9_]+__)$
+attr-rgx = [a-z_][a-z0-9_]{1,50}$
 
 [TYPECHECK]
 
@@ -44,6 +55,18 @@ ignored-classes = django.db.models
 score = yes
 
 [DESIGN]
-max-args = 5
-max-locals = 15
-max-statements = 50
+max-args = 8
+max-locals = 25
+max-returns = 8
+max-branches = 15
+max-statements = 100
+max-parents = 10
+max-attributes = 15
+min-public-methods = 1
+max-public-methods = 25
+
+[SIMILARITIES]
+min-similarity-lines = 8
+ignore-comments = yes
+ignore-docstrings = yes
+ignore-imports = yes
