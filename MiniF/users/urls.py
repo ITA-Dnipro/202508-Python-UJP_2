@@ -1,9 +1,10 @@
 from django.urls import path, include
 from dj_rest_auth.registration.views import VerifyEmailView
-from .views import CustomLoginView
+from .views import CustomLoginView, CustomLogoutView
 
 urlpatterns = [
     path("auth/login/", CustomLoginView.as_view(), name="custom-login"),
+    path("auth/logout/", CustomLogoutView.as_view(), name="logout"),
     path("auth/", include("dj_rest_auth.urls")),
     path("auth/registration/", include("dj_rest_auth.registration.urls")),
     path(
