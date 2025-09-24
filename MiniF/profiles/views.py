@@ -1,8 +1,5 @@
-from django.shortcuts import get_object_or_404, render
-from rest_framework import filters, viewsets
+from rest_framework import viewsets, filters
 from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import IsAuthenticated
-
 from .models import StartupProfile
 from .serializers import (
     InvestorProfileCreateSerializer,
@@ -10,7 +7,11 @@ from .serializers import (
     StartupProfileSerializer,
     StartupProfileUpdateSerializer,
 )
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import render, get_object_or_404
+import logging
 
+logger = logging.getLogger(__name__)
 
 class StartupProfileViewSet(viewsets.ModelViewSet):
     """
@@ -19,7 +20,9 @@ class StartupProfileViewSet(viewsets.ModelViewSet):
     """
 
     queryset = StartupProfile.objects.all()
+    serializer_class = StartupProfileSerializer
     permission_classes = [IsAuthenticated]
+
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["company_name", "description"]
     ordering_fields = ["created_at"]

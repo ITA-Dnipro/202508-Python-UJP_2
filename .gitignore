@@ -13,8 +13,11 @@ __pycache__/
 *.sqlite3
 staticfiles/
 media/
-*.log
 local_settings.py
+
+# Logs
+logs/project.log
+logs/.gitkeep
 
 # OS generated files
 .DS_Store
