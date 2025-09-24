@@ -1,10 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-# pylint: disable=W0201
-# pylint: disable=W0237,W0613
-# pylint: disable=W0221
-
 
 class ChatConsumer(AsyncWebsocketConsumer):
     """
