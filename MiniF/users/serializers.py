@@ -1,3 +1,5 @@
+# pylint: disable=arguments-differ
+# pylint: disable=arguments-renamed
 from rest_framework import serializers
 from .models import UserProfile
 
