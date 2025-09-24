@@ -39,10 +39,10 @@ jobs:
           if [ -f MiniF/requirements.txt ]; then pip install -r MiniF/requirements.txt; fi
 
       - name: Check code formatting with Black
-        run: black MiniF/
+        run: black .
 
       - name: Run Pylint
         run: |
-          export PYTHONPATH=$(pwd)/MiniF
+          export PYTHONPATH=$(pwd) 
           pylint --load-plugins pylint_django --rcfile=MiniF/.pylintrc MiniF/communications MiniF/core MiniF/dashboard MiniF/profiles MiniF/projects MiniF/users
 
