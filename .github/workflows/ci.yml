@@ -45,5 +45,5 @@ jobs:
       - name: Run Pylint
         run: |
           export PYTHONPATH=$(pwd)/MiniF
-          pylint --load-plugins=pylint_django --rcfile=MiniF/.pylintrc MiniF/communications MiniF/core MiniF/dashboard MiniF/profiles MiniF/projects MiniF/users
+          pylint --load-plugins pylint_django --rcfile=MiniF/.pylintrc MiniF/communications MiniF/core MiniF/dashboard MiniF/profiles MiniF/projects MiniF/users
 
