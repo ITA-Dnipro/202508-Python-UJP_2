@@ -10,7 +10,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = ["email", "username", "first_name", "last_name", "user_phone", "password", "password2"]
         extra_kwargs = {"password": {"write_only": True}}
 
-    def validate(self, data):
+    def validate(self, data): # pylint: disable=arguments-renamed
         if data["password"] != data["password2"]:
             raise serializers.ValidationError("Passwords do not match.")
         return data
@@ -26,5 +26,5 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             user_phone=validated_data.get("user_phone"),
         )
 
-    def save(self, request=None):
+    def save(self, request=None): # pylint: disable=arguments-differ
         return super().save()
