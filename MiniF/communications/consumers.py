@@ -1,6 +1,10 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+# pylint: disable=W0201
+# pylint: disable=W0237,W0613
+# pylint: disable=W0221
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     """
@@ -45,10 +49,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
 
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {"type": "chat.message", "message": message}
-        )
+        await self.channel_layer.group_send(self.room_group_name, {"type": "chat.message", "message": message})
 
     async def chat_message(self, event):
         """
