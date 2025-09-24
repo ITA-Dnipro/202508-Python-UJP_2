@@ -43,6 +43,6 @@ jobs:
 
       - name: Run Pylint
         run: |
-          export PYTHONPATH=$(pwd) 
-          score=$(pylint --rcfile=MiniF/.pylintrc MiniF/ | grep "Your code has been rated at" | awk '{print $7}' | cut -d/ -f1)
+          export PYTHONPATH=$(pwd)/MiniF 
+          pylint --rcfile=MiniF/.pylintrc MiniF/
 
