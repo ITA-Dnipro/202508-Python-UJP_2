@@ -15,20 +15,20 @@ init-hook =
 
 
 disable =
-    C0114,  #(missing-module-docstring) 
-    C0116,  #(missing-function-docstring)
-    C0115,  #(missing-class-docstring)
-    R0901,  #(too-many-ancestors)
-    R0903,  # too-few-public-methods (Django models/forms)
-    W0611,  # unused-import (Django __init__.py files)
-    C0411,  # wrong-import-order
-    W0201,  # attribute-defined-outside-init (Django views)
-    W0221,  # arguments-differ (Django method overrides)
-    W0237,  # arguments-renamed (Django method overrides)
-    W1203,  # logging-fstring-interpolation
-    W0718,  # broad-exception-caught
-    W1113,  # keyword-arg-before-vararg
-    W0223  # abstract-method
+    C0114,  
+    C0116,  
+    C0115,  
+    R0901,  
+    R0903,  
+    W0611,  
+    C0411,  
+    W0201,  
+    W0221,  
+    W0237,  
+    W1203,  
+    W0718,  
+    W1113, 
+    W0223 
 [FORMAT]
 max-line-length = 120
 indent-string = '    '

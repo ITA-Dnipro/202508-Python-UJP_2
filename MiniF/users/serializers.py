@@ -2,8 +2,7 @@ from rest_framework import serializers
 from .models import UserProfile
 
 
-# pylint: disable=arguments-differ
-# pylint: disable=arguments-renamed
+
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
