@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
-from .models import ChatRoom, Message
 from users.models import UserProfile
+
+from .models import ChatRoom, Message
 
 
 class ChatRoomSerializer(serializers.ModelSerializer):
@@ -27,6 +28,7 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = ["id", "room_id", "sender_username", "receiver_username", "content", "timestamp"]
 
     def get_sender_username(self, obj):
+        """Retrieve the username of the sender."""
         try:
             user = UserProfile.objects.get(id=obj.sender_id)
             return user.username
@@ -34,6 +36,7 @@ class MessageSerializer(serializers.ModelSerializer):
             return None
 
     def get_receiver_username(self, obj):
+        """Retrieve the username of the receiver."""
         try:
             user = UserProfile.objects.get(id=obj.receiver_id)
             return user.username

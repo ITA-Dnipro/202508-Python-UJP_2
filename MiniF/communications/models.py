@@ -1,24 +1,26 @@
 from django.db import models
 from django.utils import timezone
 
-from users.models import UserProfile
 from mongoengine import Document, DateTimeField, StringField, LongField
+
+from users.models import UserProfile
 
 
 class ChatRoom(models.Model):
     """
     model for conversation between users (investor and startup).
+    Prevents duplicate rooms via a unique constraint.
     """
 
     investor = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="investor_rooms")
     startup = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="startup_rooms")
     created_at = models.DateTimeField(auto_now_add=True)
 
-    """
-    avoiding duplicate rooms
-    """
-
     class Meta:
+        """
+        avoiding duplicate rooms
+        """
+
         constraints = [models.UniqueConstraint(fields=["investor", "startup"], name="unique_investor_startup_room")]
 
     def __str__(self):
@@ -37,7 +39,7 @@ class Message(Document):
     timestamp = DateTimeField(default=timezone.now)
 
     meta = {
-        "indexes": [("room_id", "timestamp")],  # Додаємо композитний індекс
+        "indexes": [("room_id", "timestamp")],
     }
 
     def __str__(self):

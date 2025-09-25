@@ -1,5 +1,5 @@
 import json
-import datetime
+import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
@@ -14,6 +14,9 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from users.models import UserProfile
 from MiniF.settings import env
 from .models import ChatRoom, Message
+
+
+logger = logging.getLogger(__name__)
 
 User = UserProfile
 
@@ -77,24 +80,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
-    async def disconnect(self, close_code):
+    async def disconnect(self, code):
         """
         Called when the WebSocket connection is CLOSED.
 
         - Removes the current channel from the room group.
         """
+        logger.debug("CLOSE_CODE: %s", code)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         if hasattr(self, "mongo_client"):
             self.mongo_client.close()
 
-    async def receive(self, text_data):
+    async def receive(self, *args, **kwargs):
         """
         Called when a message is received from the WebSocket.
 
         - Parses the JSON payload to extract the message.
         - Sends the message event to the room group.
         """
-        data = json.loads(text_data)
+        data = json.loads(kwargs["text_data"])
         message = data.get("message")
         receiver = await self.get_receiver()
         await self.save_message(self.room, self.scope["user"], receiver, message)
@@ -190,7 +194,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 timestamp=timezone.now(),
             )
             message.save()
-            if not message.id:
+            if not message.pk:
                 raise PyMongoError("Message not saved")
-        except PyMongoError as e:
-            raise PyMongoError(f"Failed to save message: {str(e)}")
+        except PyMongoError as exc:
+            raise PyMongoError(f"Failed to save message: {str(exc)}") from exc

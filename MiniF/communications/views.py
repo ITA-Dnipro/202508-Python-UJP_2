@@ -1,16 +1,17 @@
+from django.db.models import Q
+from django.shortcuts import render
+
 from rest_framework import viewsets, status, permissions
-from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
-from django.db.models import Q
+from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from .models import ChatRoom, Message
-from .serializers import ChatRoomSerializer, MessageSerializer
 from users.models import UserProfile
 from users.permissions import IsStartupRole, IsInvestorRole, _get_role_from_request
 
-from django.shortcuts import render
+from .models import ChatRoom, Message
+from .serializers import ChatRoomSerializer, MessageSerializer
 
 
 class ConversationViewSet(viewsets.ViewSet):
@@ -35,7 +36,7 @@ class ConversationViewSet(viewsets.ViewSet):
             return [permissions.IsAuthenticated()]
         return [IsStartupRole() | IsInvestorRole()]
 
-    def create(self, request):
+    def create(self, request):  # pylint: disable=too-many-return-statements
         """
         Create a new chat room or return existing one.
 
@@ -69,6 +70,8 @@ class ConversationViewSet(viewsets.ViewSet):
                 other_user = UserProfile.objects.get(username=username)
             except UserProfile.DoesNotExist:
                 return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as exc:
+                raise RuntimeError("Unexpected error while creating chat") from exc
 
             # Check if trying to create a chat with self
             if current_user == other_user:
@@ -88,23 +91,23 @@ class ConversationViewSet(viewsets.ViewSet):
                 return Response({"error": "Role not recognized or not provided."}, status=status.HTTP_400_BAD_REQUEST)
 
             serializer = ChatRoomSerializer(room)
-            return Response(serializer.data, status=status.HTTP_201_CREATED if not room.id else status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_201_CREATED if not room.pk else status.HTTP_200_OK)
 
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as exc:  # pylint: disable=broad-exception-caught
+            return Response({"error": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=["get"])
     def messages(self, request, pk=None):
         """List all messages in a specific conversation"""
         try:
-            messages = Message.objects.filter(room_id=pk).order_by("timestamp")
+            messages = Message.objects.filter(room_id=pk).order_by("timestamp")  # pylint: disable=no-member
             serializer = MessageSerializer(messages, many=True)
             return Response(serializer.data)
-        except ChatRoom.DoesNotExist:
-            raise NotFound("Conversation not found")
+        except ChatRoom.DoesNotExist as exc:
+            raise NotFound("Conversation not found") from exc
 
 
-class MessageViewSet(viewsets.ModelViewSet):
+class MessageViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
     """
     ViewSet for managing messages in chat rooms.
     Requires JWT authentication for all endpoints.
@@ -116,7 +119,7 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Only return messages from rooms where the user is a participant."""
-        return Message.objects.filter(
+        return Message.objects.filter(  # pylint: disable=no-member
             room__in=ChatRoom.objects.filter(Q(investor=self.request.user) | Q(startup=self.request.user))
         ).order_by("-created_at")
 
@@ -139,19 +142,21 @@ class MessageViewSet(viewsets.ModelViewSet):
             role = _get_role_from_request(self.request)
             if role == "startup" and room.startup != self.request.user:
                 raise PermissionDenied("Startups can only send messages as the startup in the room.")
-            elif role == "investor" and room.investor != self.request.user:
+            if role == "investor" and room.investor != self.request.user:
                 raise PermissionDenied("Investors can only send messages as the investor in the room.")
 
             receiver = room.startup if room.investor == self.request.user else room.investor
             serializer.save(sender=self.request.user, receiver=receiver, room=room)
 
-        except ChatRoom.DoesNotExist:
-            raise ValidationError({"room": "Chat room not found"})
+        except ChatRoom.DoesNotExist as exc:
+            raise ValidationError({"room": "Chat room not found"}) from exc
 
 
 def index(request):
+    """Render the chat index page."""
     return render(request, "chat/index.html")
 
 
-def room(request, room_name):
+def chat_room(request, room_name):
+    """Render the chat room page with the given room name."""
     return render(request, "chat/room.html", {"room_name": room_name})
