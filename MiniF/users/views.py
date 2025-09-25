@@ -34,6 +34,7 @@ def test_user(request):
 
 
 class CustomLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
     """
     POST /api/auth/logout/
     """
@@ -43,7 +44,7 @@ class CustomLogoutView(APIView):
             refresh_token = request.data["refresh"]
             token = RefreshToken(refresh_token)
             token.blacklist()
-            return Response({"detail":"ok"}, status=status.HTTP_205_RESET_CONTENT)
+            return Response({"detail": "Successfully logged out"}, status=status.HTTP_205_RESET_CONTENT)
         except KeyError:
             return Response({"detail": "Refresh token required"}, status=status.HTTP_400_BAD_REQUEST)
         except TokenError:
