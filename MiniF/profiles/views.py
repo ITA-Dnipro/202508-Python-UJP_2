@@ -168,3 +168,4 @@ class UnsaveProjectView(APIView):
 
         saved.delete()
         return Response({"detail": "Project unsaved"}, status=status.HTTP_204_NO_CONTENT)
+

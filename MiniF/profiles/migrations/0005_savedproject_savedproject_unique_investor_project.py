@@ -33,3 +33,4 @@ class Migration(migrations.Migration):
             constraint=models.UniqueConstraint(fields=("investor", "project"), name="unique_investor_project"),
         ),
     ]
+
