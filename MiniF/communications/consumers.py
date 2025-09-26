@@ -88,8 +88,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """
         logger.debug("CLOSE_CODE: %s", code)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-        if hasattr(self, "mongo_client"):
-            self.mongo_client.close()
 
     async def receive(self, *args, **kwargs):
         """
@@ -98,8 +96,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         - Parses the JSON payload to extract the message.
         - Sends the message event to the room group.
         """
-        data = json.loads(kwargs["text_data"])
+        try:
+            data = json.loads(kwargs["text_data"])
+        except (TypeError, json.JSONDecodeError):
+            await self.send(json.dumps({"error": "Invalid JSON"}))
+            return
         message = data.get("message")
+        if not message or not message.strip():
+            await self.send(json.dumps({"error": "Empty message"}))
+            return
         receiver = await self.get_receiver()
         await self.save_message(self.room, self.scope["user"], receiver, message)
         await self.channel_layer.group_send(
