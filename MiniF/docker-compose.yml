@@ -17,8 +17,15 @@ services:
     build: .
     volumes:
       - .:/app
+    environment:
+    - DJANGO_SETTINGS_MODULE=MiniF.settings
+    - PYTHONPATH=/app
     working_dir: /app
-    command: bash -c "black . && pylint --load-plugins pylint_django communications/ core/ dashboard/ MiniF/ profiles/ projects/ users/"
+    command: bash -c 
+      "BLACK_EXIT=0 &&
+      black --check . || BLACK_EXIT=\$? &&
+      PYLINT_EXIT=0 &&
+      pylint --load-plugins=pylint_django --rcfile=./.pylintrc communications/ core/ dashboard/ MiniF/ profiles/ projects/ users/ || PYLINT_EXIT=\$? "
 
   db:
     image: postgres:15

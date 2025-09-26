@@ -5,6 +5,9 @@ from .models import UserProfile
 from profiles.models import StartupProfile, InvestorProfile
 
 
+
+
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
     Serializer for registering a new user with password confirmation.
