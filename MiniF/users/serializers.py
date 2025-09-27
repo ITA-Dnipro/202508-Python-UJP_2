@@ -11,10 +11,6 @@ from dj_rest_auth.serializers import (
     PasswordResetConfirmSerializer as DJPasswordResetConfirmSerializer,
 )
 
-<<<<<<< HEAD
-# === Local imports ===
-=======
->>>>>>> 3e5aaf0749227b0682c4a57abfebd585a838f5c1
 from .models import UserProfile
 from profiles.models import StartupProfile, InvestorProfile
 
@@ -48,12 +44,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Passwords do not match.")
         return attrs
 
-<<<<<<< HEAD
-    # dj-rest-auth calls save(self, request)
-    def save(self, request):  # type: ignore[override]
-=======
     def save(self, request):
->>>>>>> 3e5aaf0749227b0682c4a57abfebd585a838f5c1
         data = dict(self.validated_data)
         data.pop("password2", None)
 
@@ -86,10 +77,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
             uid = force_str(urlsafe_base64_decode(attrs["uidb64"]))
             user = User.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
-<<<<<<< HEAD
-            # W0707: chain original exception for better tracebacks
-=======
->>>>>>> 3e5aaf0749227b0682c4a57abfebd585a838f5c1
             raise serializers.ValidationError({"uidb64": "Invalid uid."}) from exc
 
         if not default_token_generator.check_token(user, attrs["token"]):
@@ -98,11 +85,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         attrs["user"] = user
         return attrs
 
-<<<<<<< HEAD
-    def save(self, request=None, **kwargs):  # single save implementation (fixes E0102)
-=======
     def save(self, request=None, **kwargs):
->>>>>>> 3e5aaf0749227b0682c4a57abfebd585a838f5c1
         user = self.validated_data["user"]
         user.set_password(self.validated_data["new_password1"])
         user.save()
@@ -160,9 +143,5 @@ class CustomPasswordResetConfirmSerializer(DJPasswordResetConfirmSerializer):
         try:
             validate_password(new_password)
         except DjangoValidationError as exc:
-<<<<<<< HEAD
-            # keep original validation messages
-=======
->>>>>>> 3e5aaf0749227b0682c4a57abfebd585a838f5c1
             raise serializers.ValidationError({"new_password1": list(exc.messages)}) from exc
         return attrs
