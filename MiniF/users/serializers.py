@@ -4,6 +4,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import UserProfile
 from profiles.models import StartupProfile, InvestorProfile
 
+from dj_rest_auth.serializers import PasswordResetConfirmSerializer as DJPasswordResetConfirmSerializer
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 
 
 
@@ -27,6 +31,42 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         if attrs.get("password") != attrs.get("password2"):
             raise serializers.ValidationError("Passwords do not match.")
         return attrs
+
+
+from django.contrib.auth import get_user_model
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+
+User = get_user_model()
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uidb64 = serializers.CharField()
+    token = serializers.CharField()
+    new_password1 = serializers.CharField(min_length=8, write_only=True)
+    new_password2 = serializers.CharField(min_length=8, write_only=True)
+
+    def validate(self, attrs):
+        if attrs['new_password1'] != attrs['new_password2']:
+            raise serializers.ValidationError({"new_password2": "Passwords do not match."})
+
+        try:
+            uid = force_str(urlsafe_base64_decode(attrs['uidb64']))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            raise serializers.ValidationError({"uidb64": "Invalid uid."})
+
+        if not default_token_generator.check_token(user, attrs['token']):
+            raise serializers.ValidationError({"token": "Invalid or expired token."})
+
+        attrs['user'] = user
+        return attrs
+
+    def save(self, **kwargs):
+        user = self.validated_data['user']
+        user.set_password(self.validated_data['new_password1'])
+        user.save()
+        return user
 
     def create(self, validated_data):
         """
@@ -89,3 +129,22 @@ class CustomLoginSerializer(serializers.Serializer):
             access["role"] = role
 
         return {"refresh": str(refresh), "access": str(access)}
+
+
+class CustomPasswordResetConfirmSerializer(DJPasswordResetConfirmSerializer):
+    """
+    overwriting build in dj-rest-auth PasswordResetConfirmSerializer,
+    """
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+
+
+        new_password = attrs.get("new_password1") or attrs.get("new_password")
+
+        try:
+            validate_password(new_password)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({"new_password1": list(exc.messages)})
+
+        return attrs
