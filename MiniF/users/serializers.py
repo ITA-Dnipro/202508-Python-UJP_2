@@ -133,24 +133,18 @@ class CustomLoginSerializer(serializers.Serializer):
 
 class CustomPasswordResetConfirmSerializer(DJPasswordResetConfirmSerializer):
     """
-    Наслідуємо стандартний dj-rest-auth PasswordResetConfirmSerializer,
-    викликаємо його валідацію, а потім проганяємо новий пароль через
-    django.contrib.auth.password_validation.validate_password.
-    Поля - ті самі, що і у dj-rest-auth: uid, token, new_password1, new_password2.
+    overwriting build in dj-rest-auth PasswordResetConfirmSerializer,
     """
 
     def validate(self, attrs):
-        # Викликаємо оригінальну валідацію (перевірка token, uid, збіг паролів тощо)
         attrs = super().validate(attrs)
 
 
         new_password = attrs.get("new_password1") or attrs.get("new_password")
 
-        # Проганяємо через Django валідатори паролів (AUTH_PASSWORD_VALIDATORS)
         try:
             validate_password(new_password)
         except DjangoValidationError as exc:
-            # Перетворюємо в формат DRF
             raise serializers.ValidationError({"new_password1": list(exc.messages)})
 
         return attrs

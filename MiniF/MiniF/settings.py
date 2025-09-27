@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "dj_rest_auth",
     "dj_rest_auth.registration",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "core",
     "users",
     "communications",
@@ -115,7 +116,6 @@ REST_AUTH = {
     "PASSWORD_RESET_CONFIRM_SERIALIZER": "users.serializers.CustomPasswordResetConfirmSerializer",
 }
 
-# AUTH_PASSWORD_VALIDATORS для перевірки складності пароля
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 8}},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
@@ -144,9 +144,11 @@ PASSWORD_RESET_TIMEOUT = 86400 * 7
 REST_USE_JWT = True
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "AUTH_HEADER_TYPES": ("Bearer",),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 

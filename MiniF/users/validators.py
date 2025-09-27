@@ -12,3 +12,4 @@ class UppercaseValidator:
 
     def get_help_text(self):
         return _("Ваш пароль повинен містити хоча б одну велику літеру.")
+
