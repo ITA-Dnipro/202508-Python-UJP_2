@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import CustomLoginSerializer
+from .serializers import PasswordResetConfirmSerializer
 from django.shortcuts import render
 from django.http import JsonResponse
 import logging
@@ -27,3 +28,15 @@ def test_user(request):
     except Exception as e:
         logger.error(f"Error in users/test_user: {e}", exc_info=True)
         return JsonResponse({"error": "Internal server error"}, status=500)
+
+
+class PasswordResetConfirmAPIView(APIView):
+    """
+    POST /api/auth/password/reset/confirm/
+    body: { "uidb64": "...", "token": "...", "new_password1": "...", "new_password2": "..." }
+    """
+    def post(self, request, *args, **kwargs):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
