@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 
 class UppercaseValidator:
     def validate(self, password, user=None):
+        _ = user
         if not re.search(r"[A-Z]", password):
             raise ValidationError(
                 _("Пароль повинен містити хоча б одну велику літеру."),
