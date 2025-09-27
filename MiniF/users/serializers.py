@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# === Third-party: Django / DRF / libs ===
-=======
->>>>>>> 3e5aaf0749227b0682c4a57abfebd585a838f5c1
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.password_validation import validate_password
