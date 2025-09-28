@@ -22,3 +22,8 @@ logs/.gitkeep
 # OS generated files
 .DS_Store
 Thumbs.db
+
+.coverage
+.coverage.*
+coverage_html/
+coverage.xml
