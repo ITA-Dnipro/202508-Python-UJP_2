@@ -13,6 +13,19 @@ services:
     depends_on:
       - db
 
+  test:
+      build: .
+      volumes:
+        - .:/app
+      working_dir: /app
+      environment:
+        DJANGO_SETTINGS_MODULE: MiniF.settings   
+      command: >
+        bash -lc "
+          coverage run manage.py test &&
+          coverage report -m
+        "
+
   lint:
     build: .
     volumes:
@@ -36,7 +49,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=585662vcxz
     ports:
-      - "5432:5432"
+      - "5433:5433"
   redis:
     image: redis:latest
     ports:

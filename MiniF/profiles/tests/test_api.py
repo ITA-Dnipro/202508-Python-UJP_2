@@ -1,6 +1,7 @@
 from rest_framework.test import APITestCase
 from django.urls import reverse
 from users.models import UserProfile
+from profiles.models import Industry
 
 class StartupProfileAPITest(APITestCase):
     def setUp(self):
@@ -9,6 +10,10 @@ class StartupProfileAPITest(APITestCase):
             username="testuser",
             user_phone="+380123456789",
             password="testpassword"
+        )
+        
+        self.industry = Industry.objects.create(
+            industry_name="Technology"
         )
         self.client.force_authenticate(user=self.user)
 
@@ -19,7 +24,7 @@ class StartupProfileAPITest(APITestCase):
             "company_name": "Test Company",
             "description": "Test description",
             "website": "http://example.com",
-            "industry_id": 1,
+            "industry_id": self.industry.id,
             "location": "Kyiv"
         }
         response = self.client.post(url, data, format='json')
@@ -32,7 +37,7 @@ class StartupProfileAPITest(APITestCase):
             "user_id": self.user.id,
             "description": "Test description",
             "website": "http://example.com",
-            "industry_id": 1,
+            "industry_id": self.industry.id,
             "location": "Kyiv"
         }
         response = self.client.post(url, data, format='json')

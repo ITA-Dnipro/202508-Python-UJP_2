@@ -1,6 +1,6 @@
 from django.test import TestCase
 from users.models import UserProfile
-from profiles.models import StartupProfile
+from profiles.models import StartupProfile, Industry
 
 class StartupProfileModelsTest(TestCase):
     def setUp(self):
@@ -9,6 +9,9 @@ class StartupProfileModelsTest(TestCase):
             username="testuser",
             user_phone="+380123456789"
         )
+        self.industry = Industry.objects.create(
+            industry_name="Technology"
+        )
 
     def test_startup_profile_creation_success(self):
         profile = StartupProfile.objects.create(
@@ -16,12 +19,12 @@ class StartupProfileModelsTest(TestCase):
             company_name="Test Company",
             description="A test startup",
             website="http://example.com",
-            industry_id=1,
+            industry_id=self.industry,
             location="Kyiv"
         )
-        self.assertEqual (profile.company_name, "Test Company")
-        self.assertEqual (profile.website, "http://example.com")
-        self.assertEqual (profile.location, "Kyiv")
+        self.assertEqual(profile.company_name, "Test Company")
+        self.assertEqual(profile.website, "http://example.com")
+        self.assertEqual(profile.location, "Kyiv")
 
     def test_startup_profile_creation_fail(self):
         with self.assertRaises(Exception):

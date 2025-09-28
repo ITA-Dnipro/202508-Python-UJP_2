@@ -24,15 +24,14 @@ source = ["."]
 parallel = false
 omit = [
   "*/migrations/*",
-  "*/tests/*",
   "*/venv/*",
   "*/.venv/*",
-  "*/node_modules/*",
   "manage.py",
   "*/settings/*",
    "*/config/*", 
    "*/wsgi.py",
-   "*/asgi.py"
+   "*/asgi.py",
+   "*/settings.py"
 ]
 
 [tool.coverage.report]
