@@ -155,7 +155,7 @@ class UnsaveProjectView(APIView):
         if not investor_id:
             return Response({"detail": "investor_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        investor = get_object_or_404(InvestorProfile, id=investor_id)
+        investor = get_object_or_404(InvestorProfile, id=investor_id) #pylint: disable=unused-variable
 
         saved_project_id = request.query_params.get("saved_project_id")
         if not saved_project_id:
