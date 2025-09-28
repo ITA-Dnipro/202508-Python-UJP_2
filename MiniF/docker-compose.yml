@@ -49,7 +49,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=585662vcxz
     ports:
-      - "5433:5433"
+      - "5432:5432"
   redis:
     image: redis:latest
     ports:
