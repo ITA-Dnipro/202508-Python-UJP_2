@@ -2,6 +2,8 @@ from pathlib import Path
 import environ
 import os
 from datetime import timedelta
+import mongoengine
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,15 +27,16 @@ INSTALLED_APPS = [
     "daphne",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+
     "rest_framework",
     "rest_framework.authtoken",
+
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "dj_rest_auth",
     "dj_rest_auth.registration",
     "rest_framework_simplejwt",
-    "rest_framework_simplejwt.token_blacklist",
     "core",
     "users",
     "communications",
@@ -91,6 +94,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
+mongoengine.connect(host=env("MONGO_URI"))
 LANGUAGE_CODE = env("LANGUAGE_CODE")
 TIME_ZONE = env("TIME_ZONE")
 USE_I18N = True
@@ -131,8 +135,6 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "AUTH_HEADER_TYPES": ("Bearer",),
-    "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 
@@ -195,5 +197,10 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
-    },
+        "communications": {
+            "handlers": ["console", "file"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    }
 }
