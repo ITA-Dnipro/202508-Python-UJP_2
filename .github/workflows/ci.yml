@@ -16,7 +16,7 @@ jobs:
       DJANGO_SETTINGS_MODULE: MiniF.settings
       PYTHONPATH: ${{ github.workspace }}/MiniF
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      MONGO_URL: ${{ secrets.MONGO_URL }}
+      MONGO_URI: ${{ secrets.MONGO_URI }}
 
     steps:
       - name: Checkout repository
