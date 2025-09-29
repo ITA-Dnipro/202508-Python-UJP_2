@@ -4,10 +4,11 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class StartupProfileModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='pass')
-        self.industry = Industry.objects.create(industry_name='TechIndustry')
+        self.user = User.objects.create_user(username="testuser", password="pass")
+        self.industry = Industry.objects.create(industry_name="TechIndustry")
 
     def test_profile_creation(self):
         profile = StartupProfile.objects.create(
@@ -16,7 +17,7 @@ class StartupProfileModelTest(TestCase):
             description="A test startup",
             website="http://example.com",
             industry_id=self.industry,
-            location="Kyiv"
+            location="Kyiv",
         )
         self.assertEqual(profile.company_name, "Test Company")
         self.assertEqual(profile.location, "Kyiv")
