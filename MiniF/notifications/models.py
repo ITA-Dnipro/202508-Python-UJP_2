@@ -7,10 +7,10 @@ class NotificationType(models.Model):
     """
     Model for type of notification
     """
-    type = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
-        return self.type
+        return self.name
 
 
 class Notification(models.Model):
@@ -24,13 +24,13 @@ class Notification(models.Model):
     )
     investor = models.ForeignKey(
         InvestorProfile,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
     startup = models.ForeignKey(
         StartupProfile,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL(),
         null=True,
         blank=True
     )
