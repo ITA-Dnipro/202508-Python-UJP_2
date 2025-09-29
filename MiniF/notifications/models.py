@@ -30,7 +30,7 @@ class Notification(models.Model):
     )
     startup = models.ForeignKey(
         StartupProfile,
-        on_delete=models.SET_NULL(),
+        on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
