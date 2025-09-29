@@ -1,5 +1,6 @@
 from pathlib import Path
 import environ
+import os
 from datetime import timedelta
 import mongoengine
 import os
@@ -26,8 +27,10 @@ INSTALLED_APPS = [
     "daphne",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+
     "rest_framework",
     "rest_framework.authtoken",
+
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -81,7 +84,7 @@ else:
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
-        },
+        }
     }
 CHANNEL_LAYERS = {
     "default": {
@@ -129,7 +132,7 @@ DEFAULT_FROM_EMAIL = "no-reply@example.com"
 REST_USE_JWT = True
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
@@ -165,12 +168,12 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["file"],
+            "handlers": ["console", "file"],
             "level": "DEBUG",
             "propagate": True,
         },
         "django.db.backends": {
-            "handlers": ["file"],
+            "handlers": ["console", "file"],
             "level": "INFO",
             "propagate": False,
         },
@@ -199,5 +202,5 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
-    },
+    }
 }

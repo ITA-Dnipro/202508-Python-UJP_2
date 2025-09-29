@@ -1,17 +1,25 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, generics, status
 from rest_framework.generics import CreateAPIView
-from .models import StartupProfile
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .models import StartupProfile, InvestorProfile, SavedProject
 from .serializers import (
     InvestorProfileCreateSerializer,
     StartupProfileCreateSerializer,
     StartupProfileSerializer,
     StartupProfileUpdateSerializer,
+    SavedProjectSerializer
 )
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.db import IntegrityError
 import logging
 
+from projects.models import StartupProject
+
 logger = logging.getLogger(__name__)
+
 
 class StartupProfileViewSet(viewsets.ModelViewSet):
     """
@@ -91,3 +99,72 @@ class InvestorProfileCreateView(CreateAPIView):
 
     serializer_class = InvestorProfileCreateSerializer
     permission_classes = [IsAuthenticated]
+
+
+class SaveProjectView(APIView):
+    """
+    Endpoint for saving a project for an investor.
+    """
+
+    def post(self, request):
+        investor_id = request.data.get("investor_id")
+        if not investor_id:
+            return Response({"detail": "investor_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        investor = get_object_or_404(InvestorProfile, id=investor_id)
+
+        project_id = request.data.get("project_id")
+        if not project_id:
+            return Response({"detail": "project_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        project = get_object_or_404(StartupProject, id=project_id)
+
+        try:
+            saved = SavedProject.objects.create(investor=investor, project=project)
+        except IntegrityError:
+            return Response({"detail": "Project already saved"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "detail": "Project saved",
+            "saved_project_id": saved.id,
+            "investor_id": investor.id,
+            "project_id": project.id
+        }, status=status.HTTP_201_CREATED)
+
+
+class SavedProjectListView(generics.ListAPIView):
+    """
+    List all projects saved by the authenticated investor.
+    """
+
+    serializer_class = SavedProjectSerializer
+
+    def get_queryset(self):
+        investor_id = self.request.query_params.get("investor_id")
+        investor = get_object_or_404(InvestorProfile, id=investor_id)
+        return SavedProject.objects.filter(investor=investor)
+
+
+class UnsaveProjectView(APIView):
+    """
+    API endpoint to remove a saved project for an investor.
+    """
+
+    def delete(self, request):
+        investor_id = request.query_params.get("investor_id")
+        if not investor_id:
+            return Response({"detail": "investor_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        investor = get_object_or_404(InvestorProfile, id=investor_id)
+
+        saved_project_id = request.query_params.get("saved_project_id")
+        if not saved_project_id:
+            return Response({"detail": "saved_project_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        saved = SavedProject.objects.filter(id=saved_project_id).first()
+        if not saved:
+            return Response({"detail": "Project not saved"}, status=status.HTTP_404_NOT_FOUND)
+
+        saved.delete()
+        return Response({"detail": "Project unsaved"}, status=status.HTTP_204_NO_CONTENT)

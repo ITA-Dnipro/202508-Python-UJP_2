@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import StartupProfile, InvestorProfile
 from projects.serializers import StartupProjectSerializer
+from .models import StartupProfile, SavedProject
 
 
 class StartupProfileSerializer(serializers.ModelSerializer):
@@ -100,3 +101,11 @@ class InvestorProfileUpdateSerializer(serializers.ModelSerializer):
             "investment_focus": {"required": False},
             "location": {"required": False},
         }
+
+
+class SavedProjectSerializer(serializers.ModelSerializer):
+    project = StartupProjectSerializer(read_only=True)
+
+    class Meta:
+        model = SavedProject
+        fields = ["id", "project", "created_at"]
