@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import StartupProfile, InvestorProfile
+from .models import InvestorProfile
 from projects.serializers import StartupProjectSerializer
 from .models import StartupProfile, SavedProject
 
