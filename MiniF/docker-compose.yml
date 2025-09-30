@@ -13,6 +13,19 @@ services:
     depends_on:
       - db
 
+  test:
+      build: .
+      volumes:
+        - .:/app
+      working_dir: /app
+      environment:
+        DJANGO_SETTINGS_MODULE: MiniF.settings   
+      command: >
+        bash -lc "
+          coverage run manage.py test &&
+          coverage report -m
+        "
+
   lint:
     build: .
     volumes:
@@ -21,12 +34,14 @@ services:
     - DJANGO_SETTINGS_MODULE=MiniF.settings
     - PYTHONPATH=/app
     working_dir: /app
-    command: bash -c 
-      "BLACK_EXIT=0 &&
-      black --check . || BLACK_EXIT=\$? &&
-      PYLINT_EXIT=0 &&
-      pylint --load-plugins=pylint_django --rcfile=./.pylintrc communications/ core/ dashboard/ MiniF/ profiles/ projects/ users/ || PYLINT_EXIT=\$? "
-
+    command: >
+      bash -c "
+        BLACK_EXIT=0 &&
+        black --check . || BLACK_EXIT=$$? &&
+        PYLINT_EXIT=0 &&
+        pylint --load-plugins=pylint_django --rcfile=./.pylintrc communications/ core/ dashboard/ MiniF/ profiles/ projects/ users/ || PYLINT_EXIT=$$? &&
+        exit $$(($$BLACK_EXIT + $$PYLINT_EXIT))
+      "
   db:
     image: postgres:15
     volumes:
@@ -44,7 +59,16 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
-
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: 585662vcxz
+    volumes:
+      - mongodb_data:/data/db
 volumes:
   postgres_data:
   redis_data:
+  mongodb_data:
