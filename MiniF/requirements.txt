@@ -1,3 +1,4 @@
+asgiref==3.9.1
 black==24.10.0
 channels==4.1.0
 channels-redis==4.2.0
@@ -9,10 +10,13 @@ django-allauth
 django-environ==0.11.2
 djangorestframework==3.15.2
 djangorestframework-simplejwt==5.3.1
+mongoengine==0.29.1
 psycopg2-binary==2.9.10
-pylint==2.6.1
+pylint==3.2.7
 pylint-django==2.6.1
+pymongo==4.10.1
 requests
 sqlparse==0.5.3
 typing_extensions==4.15.0
 tzdata==2025.2
+
