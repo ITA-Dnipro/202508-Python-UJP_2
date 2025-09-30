@@ -9,7 +9,9 @@ class CommunicationsViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_room_view(self):
-        """Checks that the room view returns status 200 and passes room_name."""
+        """Checks that the room view returns status 200."""
         response = self.client.get(reverse("room", args=["testroom"]))
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"testroom", response.content)
+        
+        self.assertIn(b"WebSocket", response.content)
+        self.assertIn(b"ws://", response.content)

@@ -3,7 +3,6 @@ import environ
 import os
 from datetime import timedelta
 import mongoengine
-import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -36,6 +35,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "dj_rest_auth",
     "dj_rest_auth.registration",
+    'rest_framework_simplejwt.token_blacklist',
     "rest_framework_simplejwt",
     "core",
     "users",
