@@ -10,6 +10,6 @@ urlpatterns = [
     path("startup/", StartupProfileCreateView.as_view(), name="startup-create"),
     path("investor/", InvestorProfileCreateView.as_view(), name="investor-create"),
     path("investor/saved-projects/", SavedProjectListView.as_view(), name="saved-projects"),
-    path("investor/saved-projects/unsave/", UnsaveProjectView.as_view(), name="unsave-project"),
-    path("investor/save-project/", SaveProjectView.as_view(), name="save-project"),
+    path("investor/saved-projects/<int:saved_project_id>/unsave/", UnsaveProjectView.as_view(), name="unsave-project"),
+    path("investor/save-project/<int:project_id>", SaveProjectView.as_view(), name="save-project"),
 ]

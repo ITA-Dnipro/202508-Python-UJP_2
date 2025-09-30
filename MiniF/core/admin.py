@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from users.models import UserProfile
-from profiles.models import InvestorProfile, StartupProfile, Industry
+from profiles.models import InvestorProfile, StartupProfile, Industry, SavedProject
 from projects.models import StartupProject
 
 
@@ -22,3 +22,4 @@ admin.site.register(StartupProfile)
 admin.site.register(StartupProject)
 admin.site.register(Industry)
 admin.site.register(InvestorProfile)
+admin.site.register(SavedProject)
