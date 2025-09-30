@@ -1,6 +1,13 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import StartupProfileViewSet, StartupProfileCreateView, InvestorProfileCreateView, SaveProjectView, SavedProjectListView, UnsaveProjectView
+from .views import (
+    StartupProfileViewSet, 
+    StartupProfileCreateView, 
+    InvestorProfileCreateView, 
+    SaveProjectView, 
+    SavedProjectListView, 
+    UnsaveProjectView
+)
 
 router = DefaultRouter()
 router.register(r"startup-profiles", StartupProfileViewSet, basename="startupprofile")
