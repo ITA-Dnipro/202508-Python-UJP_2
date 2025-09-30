@@ -13,6 +13,19 @@ services:
     depends_on:
       - db
 
+  test:
+      build: .
+      volumes:
+        - .:/app
+      working_dir: /app
+      environment:
+        DJANGO_SETTINGS_MODULE: MiniF.settings   
+      command: >
+        bash -lc "
+          coverage run manage.py test &&
+          coverage report -m
+        "
+
   lint:
     build: .
     volumes:
