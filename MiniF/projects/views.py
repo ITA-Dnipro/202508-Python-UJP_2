@@ -1,8 +1,13 @@
+from rest_framework import viewsets
+from .models import StartupProject
+from .serializers import StartupProjectSerializer
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import render
 from django.http import JsonResponse
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 def test_project(request):
     logger.info("projects/test_project endpoint called")
@@ -15,4 +20,7 @@ def test_project(request):
         return JsonResponse({"error": "Internal server error"}, status=500)
 
 
-# Create your views here.
+class StartupProjectViewSet(viewsets.ModelViewSet):
+    queryset = StartupProject.objects.all()
+    serializer_class = StartupProjectSerializer
+    permission_classes = [IsAuthenticated]

@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "daphne",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "reversion",
 
     "rest_framework",
     "rest_framework.authtoken",
