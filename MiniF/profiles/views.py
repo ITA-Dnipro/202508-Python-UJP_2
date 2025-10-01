@@ -160,4 +160,6 @@ class UnsaveProjectView(APIView):
         saved.project.likes = F("likes") - 1
         saved.project.save(update_fields=["likes"])
         saved.project.refresh_from_db()
+        saved.delete()
+
         return Response({"detail": "Project unsaved"}, status=status.HTTP_204_NO_CONTENT)
