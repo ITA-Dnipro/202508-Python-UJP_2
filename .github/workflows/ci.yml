@@ -89,8 +89,8 @@ jobs:
         DJANGO_SETTINGS_MODULE: MiniF.settings
         PYTHONPATH: ${{ github.workspace }}/MiniF
         
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        MONGO_URI: ${{ secrets.MONGO_URI }}
+        DATABASE_URL: ${{ secrets.DATABASE_URL_CI }}
+        MONGO_URI: ${{ secrets.MONGO_URI_CI }}
         
         TIME_ZONE: ${{ secrets.TIME_ZONE }}
         LANGUAGE_CODE: ${{ secrets.LANGUAGE_CODE }}
