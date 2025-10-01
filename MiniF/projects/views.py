@@ -9,7 +9,7 @@ from .documents import StartupDocument
 from .serializers import StartupDocumentSerializer
 
 
-class StartupDocumentView(DocumentViewSet):
+class StartupProjectView(DocumentViewSet):
     """Search endpoint for startup projects."""
 
     document = StartupDocument
