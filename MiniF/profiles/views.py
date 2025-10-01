@@ -16,8 +16,8 @@ from django.http import JsonResponse
 from django.db import IntegrityError
 from users.permissions import IsInvestorRole
 import logging
-
 from projects.models import StartupProject
+from django.db.models import F
 
 logger = logging.getLogger(__name__)
 
@@ -113,8 +113,9 @@ class SaveProjectView(APIView):
 
         try:
             saved = SavedProject.objects.create(investor=investor, project=project)
-            project.likes += 1
-            project.save()
+            project.likes = F("likes") + 1
+            project.save(update_fields=["likes"])
+            project.refresh_from_db()
         except IntegrityError:
             return Response({"detail": "Project already saved"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -156,7 +157,7 @@ class UnsaveProjectView(APIView):
         if not saved:
             return Response({"detail": "Project not saved"}, status=status.HTTP_404_NOT_FOUND)
 
-        saved.project.likes -= 1
-        saved.project.save()
-        saved.delete()
+        saved.project.likes = F("likes") - 1
+        saved.project.save(update_fields=["likes"])
+        saved.project.refresh_from_db()
         return Response({"detail": "Project unsaved"}, status=status.HTTP_204_NO_CONTENT)
