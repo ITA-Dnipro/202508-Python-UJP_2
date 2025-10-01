@@ -195,7 +195,7 @@ class StartupSearchViewSet(DocumentViewSet):
 
     filter_fields = {
         "location": "location",
-        "industry_name.raw": "industry_name.raw",
+        "industry_name": "industry_name.raw",
     }
 
     ordering_fields = {
