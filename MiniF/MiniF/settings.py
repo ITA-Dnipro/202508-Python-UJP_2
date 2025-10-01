@@ -1,6 +1,5 @@
 from pathlib import Path
 import environ
-import os
 from datetime import timedelta
 import mongoengine
 import os
@@ -27,6 +26,8 @@ INSTALLED_APPS = [
     "daphne",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "django_elasticsearch_dsl",
+    "django_elasticsearch_dsl_drf",
 
     "rest_framework",
     "rest_framework.authtoken",
@@ -95,6 +96,17 @@ CHANNEL_LAYERS = {
     },
 }
 mongoengine.connect(host=env("MONGO_URI"))
+
+ELASTICSEARCH_DSL = {
+
+    'default': {
+
+        'hosts': 'http://elasticsearch:9200'
+
+    },
+
+}
+
 LANGUAGE_CODE = env("LANGUAGE_CODE")
 TIME_ZONE = env("TIME_ZONE")
 USE_I18N = True
@@ -168,12 +180,12 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["console", "file"],
+            "handlers": ["file"],
             "level": "DEBUG",
             "propagate": True,
         },
         "django.db.backends": {
-            "handlers": ["console", "file"],
+            "handlers": ["file"],
             "level": "INFO",
             "propagate": False,
         },

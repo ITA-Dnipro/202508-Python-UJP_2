@@ -6,6 +6,7 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
+      - ./logs:/app/logs
     ports:
       - "8000:8000"
     env_file:
@@ -55,7 +56,20 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: 585662vcxz
     volumes:
       - mongodb_data:/data/db
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
 volumes:
   postgres_data:
   redis_data:
   mongodb_data:
+  es_data:
