@@ -16,3 +16,32 @@ exclude = '''
   )/
 )
 '''
+
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+parallel = false
+omit = [
+  "*/migrations/*",
+  "*/venv/*",
+  "*/.venv/*",
+  "manage.py",
+  "*/settings/*",
+   "*/config/*", 
+   "*/wsgi.py",
+   "*/asgi.py",
+   "*/settings.py"
+]
+
+[tool.coverage.report]
+fail_under = 70       
+show_missing = true
+skip_covered = true
+precision = 1
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.coverage.paths]
+source = ["/app", "."]

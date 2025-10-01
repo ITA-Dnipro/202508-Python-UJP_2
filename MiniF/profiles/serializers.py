@@ -1,9 +1,9 @@
 from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from rest_framework import serializers
-from .models import InvestorProfile
+from .models import StartupProfile, InvestorProfile, SavedProject
 from projects.serializers import StartupProjectSerializer
-from .models import StartupProfile, SavedProject
 from .documents import StartupDocument
+
 
 
 class StartupProfileSerializer(serializers.ModelSerializer):
