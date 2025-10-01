@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("profiles", "0006_alter_investorprofile_investment_focus_and_more"),
+        ("profiles", "0005_savedproject_savedproject_unique_investor_project"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
