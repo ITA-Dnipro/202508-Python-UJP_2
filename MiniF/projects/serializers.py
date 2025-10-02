@@ -9,4 +9,4 @@ class StartupProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StartupProject
-        fields = '__all__'
+        fields = "__all__"

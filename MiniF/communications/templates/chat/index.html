@@ -1,27 +1,54 @@
-<!-- chat/templates/chat/index.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <title>Chat Rooms</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Login</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-container { max-width: 400px; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        input, button { width: 100%; margin: 10px 0; padding: 10px; }
+        button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+    </style>
 </head>
 <body>
-    What chat room would you like to enter?<br>
-    <input id="room-name-input" type="text" size="100"><br>
-    <input id="room-name-submit" type="button" value="Enter">
+    <div class="form-container">
+        <h2>Login to Chat</h2>
+        <form id="loginForm">
+            <input type="text" id="token" placeholder="Enter JWT Token" required>
+            <input type="text" id="username" placeholder="Enter Your Username" required>
+            <button type="submit">Login</button>
+        </form>
+        <div id="message"></div>
+    </div>
 
     <script>
-        document.querySelector('#room-name-input').focus();
-        document.querySelector('#room-name-input').onkeyup = function(e) {
-            if (e.key === 'Enter') {  // enter, return
-                document.querySelector('#room-name-submit').click();
-            }
-        };
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = document.getElementById('token').value;
+            const username = document.getElementById('username').value;
 
-        document.querySelector('#room-name-submit').onclick = function(e) {
-            var roomName = document.querySelector('#room-name-input').value;
-            window.location.pathname = '/chat/' + roomName + '/';
-        };
+            const response = await fetch('http://127.0.0.1:8000/chat/api/conversations/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: username }),
+            });
+
+            const data = await response.json();
+            const messageDiv = document.getElementById('message');
+
+            if (response.ok) {
+                // Redirect to chat with the room ID
+                window.location.href = `chat.html?roomId=${data.id}&token=${token}&username=${username}`;
+            } else {
+                messageDiv.innerText = `Error: ${data.error || 'Failed to login'}`;
+                messageDiv.style.color = 'red';
+            }
+        });
     </script>
 </body>
 </html>
