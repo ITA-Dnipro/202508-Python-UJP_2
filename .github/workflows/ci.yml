@@ -135,3 +135,10 @@ jobs:
             coverage report
             coverage xml
 
+            
+        - name: Upload coverage reports to Codecov
+          uses: codecov/codecov-action@v5
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}
+            slug: ITA-Dnipro/202508-Python-UJP_2
+
