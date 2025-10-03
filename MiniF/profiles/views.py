@@ -1,3 +1,7 @@
+from django_elasticsearch_dsl_drf.filter_backends import FilteringFilterBackend, OrderingFilterBackend, \
+    SearchFilterBackend
+from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
+
 from rest_framework import viewsets, filters, generics, status
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
@@ -12,11 +16,13 @@ from .serializers import (
 )
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
 from django.db import IntegrityError
 import logging
 
 from projects.models import StartupProject
+
+from .documents import StartupDocument
+from .serializers import StartupDocumentSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -168,3 +174,35 @@ class UnsaveProjectView(APIView):
 
         saved.delete()
         return Response({"detail": "Project unsaved"}, status=status.HTTP_204_NO_CONTENT)
+
+class StartupSearchViewSet(DocumentViewSet):
+    """
+    Search endpoint for startup profiles.
+    """
+
+    document = StartupDocument
+    serializer_class = StartupDocumentSerializer
+
+    filter_backends = [
+        FilteringFilterBackend,
+        OrderingFilterBackend,
+        SearchFilterBackend,
+    ]
+
+    search_fields = (
+        "company_name",
+        "description",
+        "industry_name",
+    )
+
+    filter_fields = {
+        "location": "location",
+        "industry_name": "industry_name.raw",
+    }
+
+    ordering_fields = {
+        "company_name": "company_name.raw",
+        "location": "location",
+        "industry_name": "industry_name.raw",
+    }
+    ordering = ("company_name.raw",)
