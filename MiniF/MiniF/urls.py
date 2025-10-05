@@ -9,4 +9,5 @@ urlpatterns = [
     path("chat/", include("communications.urls")),
     path("profiles/startups/", startup_list),
     path("profiles/startups/<int:startup_id>/", startup_detail),
+    path("notifications/", include("notifications.urls"))
 ]
