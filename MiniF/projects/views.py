@@ -1,15 +1,8 @@
-from rest_framework import viewsets
-from .models import StartupProject
-from .serializers import StartupProjectSerializer
-from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import render
-from rest_framework import viewsets, filters
-from .models import StartupProject
-from .serializers import StartupProjectSerializer
-from rest_framework.permissions import IsAuthenticated
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
 import logging
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
+from rest_framework import viewsets, filters
+from rest_framework.permissions import IsAuthenticated
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
@@ -17,11 +10,13 @@ from django_elasticsearch_dsl_drf.filter_backends import (
     DefaultOrderingFilterBackend,
     SearchFilterBackend,
 )
+from .models import StartupProject
+from .serializers import (
+    StartupProjectSerializer,
+    StartupProjectCreateUpdateSerializer,
+)
 from .documents import StartupDocument
 from .serializers import StartupDocumentSerializer
-
-from .models import StartupProject
-from .serializers import StartupProjectSerializer, StartupProjectCreateUpdateSerializer
 
 logger = logging.getLogger(__name__)
 
