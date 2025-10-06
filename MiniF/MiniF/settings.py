@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "dj_rest_auth.registration",
     'rest_framework_simplejwt.token_blacklist',
     "rest_framework_simplejwt",
+    "reversion",
     "core",
     "users",
     "communications",
