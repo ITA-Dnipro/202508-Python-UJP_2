@@ -5,7 +5,6 @@ from profiles.models import InvestorProfile, SavedProject, StartupProfile, Indus
 from reversion.admin import VersionAdmin
 from notifications.models import Notification, NotificationType
 from projects.models import StartupProject
-from users.models import UserProfile
 
 
 @admin.register(StartupProject)
