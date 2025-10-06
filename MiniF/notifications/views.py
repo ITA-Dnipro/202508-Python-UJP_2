@@ -4,17 +4,19 @@ from .models import Notification
 from .serializers import NotificationSerializer
 from profiles.models import InvestorProfile
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from users.permissions import IsInvestorRole
 
 class NotificationListView(generics.ListCreateAPIView):
     """
     class to get list of investor's notifications"
     """
     serializer_class = NotificationSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsInvestorRole]
 
     def get_queryset(self):
         try:
-            investor_profile=InvestorProfile.objects.get(user_id=self.request.user.id)
+            investor_profile = get_object_or_404(InvestorProfile, user_id=self.request.user.id)
             return Notification.objects.filter(investor=investor_profile).order_by('-created_at')
         except InvestorProfile.DoesNotExist:
             return Notification.objects.none()
@@ -25,10 +27,10 @@ class NotificationDetailView(generics.RetrieveAPIView):
     class to get notification details by id and make it is_read
     """
     serializer_class = NotificationSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsInvestorRole]
 
     def get_queryset(self):
-        investor_profile = InvestorProfile.objects.get(user_id=self.request.user.id)
+        investor_profile = get_object_or_404(InvestorProfile, user_id=self.request.user.id)
         return Notification.objects.filter(investor=investor_profile)
 
     def get_object(self):
@@ -45,10 +47,10 @@ class NotificationDeleteView(generics.DestroyAPIView):
     class to delete notification by id
     """
     serializer_class = NotificationSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsInvestorRole]
 
     def get_queryset(self):
-        investor_profile = InvestorProfile.objects.get(user_id=self.request.user.id)
+        investor_profile = get_object_or_404(InvestorProfile, user_id=self.request.user.id)
         return Notification.objects.filter(investor=investor_profile)
 
     def destroy(self, request, *args, **kwargs):
