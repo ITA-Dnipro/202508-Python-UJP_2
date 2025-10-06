@@ -1,15 +1,30 @@
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .serializers import CustomLoginSerializer
-from .serializers import PasswordResetConfirmSerializer
-from django.shortcuts import render
-from django.http import JsonResponse
 import logging
+from django.http import JsonResponse
+from django.shortcuts import render
+from rest_framework import status, viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from .models import UserProfile
+from .serializers import (
+    UserProfileSerializer,
+    CustomLoginSerializer,
+    PasswordResetConfirmSerializer,
+)
 
 logger = logging.getLogger(__name__)
+
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows user profiles to be viewed or edited.
+    """
+
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class CustomLoginView(APIView):

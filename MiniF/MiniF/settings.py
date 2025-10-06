@@ -31,7 +31,6 @@ INSTALLED_APPS = [
 
     "rest_framework",
     "rest_framework.authtoken",
-
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -46,6 +45,7 @@ INSTALLED_APPS = [
     "dashboard",
     "profiles",
     "projects",
+    "drf_yasg",
     "notifications",
 ]
 
@@ -144,9 +144,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 
@@ -234,4 +233,16 @@ LOGGING = {
             "propagate": True,
         },
     }
+}
+
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization",
+            "description": "Введи JWT токен у форматі: Bearer <your_token>",
+        }
+    },
+    "USE_SESSION_AUTH": False,
 }
