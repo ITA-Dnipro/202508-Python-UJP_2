@@ -15,6 +15,8 @@ from django_elasticsearch_dsl_drf.filter_backends import (
 from .documents import StartupDocument
 from .serializers import StartupDocumentSerializer
 
+logger = logging.getLogger(__name__)
+
 
 def test_project(request):
     logger.info("projects/test_project endpoint called")
