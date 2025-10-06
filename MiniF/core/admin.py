@@ -1,10 +1,10 @@
 from django.contrib import admin
-from reversion.admin import VersionAdmin
 from django.contrib.auth.admin import UserAdmin
-from users.models import UserProfile
-from profiles.models import InvestorProfile, StartupProfile, Industry
+from reversion.admin import VersionAdmin
 from notifications.models import Notification, NotificationType
+from profiles.models import InvestorProfile, StartupProfile, Industry
 from projects.models import StartupProject
+from users.models import UserProfile
 
 
 @admin.register(StartupProject)
