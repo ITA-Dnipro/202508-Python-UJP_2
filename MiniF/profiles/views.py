@@ -2,6 +2,7 @@ from rest_framework import viewsets, filters, generics, status
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.forms import ValidationError
 from .models import StartupProfile, InvestorProfile, Industry, SavedProject
 
 from .serializers import (
@@ -9,7 +10,8 @@ from .serializers import (
     StartupProfileCreateSerializer,
     StartupProfileSerializer,
     StartupProfileUpdateSerializer,
-    InvestorProfileSerializer, 
+    InvestorProfileSerializer,
+    InvestorProfileUpdateSerializer,
     IndustrySerializer,
     SavedProjectSerializer
 )
@@ -26,7 +28,6 @@ logger = logging.getLogger(__name__)
 
 class StartupProfileViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows startup profiles to be viewed or edited.
     Read/Update endpoints for startup profiles.
     Supports search and ordering via query params.
     """
@@ -44,6 +45,8 @@ class StartupProfileViewSet(viewsets.ModelViewSet):
         Use an update-friendly serializer for PUT/PATCH,
         otherwise the read serializer.
         """
+        if self.action == "create":
+            return StartupProfileCreateSerializer
         if self.action in ("update", "partial_update"):
             return StartupProfileUpdateSerializer
         return StartupProfileSerializer
@@ -69,9 +72,30 @@ class StartupProfileViewSet(viewsets.ModelViewSet):
         return qs
 
 
+class InvestorProfileViewSet(viewsets.ModelViewSet):
+    """
+    CRUD for InvestorProfile.
+    """
+    queryset = InvestorProfile.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return InvestorProfileCreateSerializer
+        if self.action in ("update", "partial_update"):
+            return InvestorProfileUpdateSerializer
+        return InvestorProfileSerializer
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if InvestorProfile.objects.filter(user_id=user).exists():
+            raise ValidationError({"detail": "Investor profile already exists."})
+        serializer.save(user_id=user)
+
+
 def startup_list(request):
     """
-        Render a simple HTML list of all startup profiles.
+    Render a simple HTML list of all startup profiles.
     """
     startups = StartupProfile.objects.all()
     return render(request, "startup-list.html", {"startups": startups})
@@ -79,21 +103,11 @@ def startup_list(request):
 
 def startup_detail(request, startup_id):
     """
-        Render a simple HTML detail page for a single startup profile.
+    Render a simple HTML detail page for a single startup profile.
     """
-
     startup = get_object_or_404(StartupProfile, id=startup_id)
     context = {"startup": startup}
     return render(request, "startup-detail.html", {"startup": startup})
-
-class InvestorProfileViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows investor profiles to be viewed or edited.
-    """
-
-    queryset = InvestorProfile.objects.all()
-    serializer_class = InvestorProfileSerializer
-    permission_classes = [IsAuthenticated]
 
 
 class IndustryViewSet(viewsets.ModelViewSet):
@@ -103,6 +117,7 @@ class IndustryViewSet(viewsets.ModelViewSet):
 
     queryset = Industry.objects.all()
     serializer_class = IndustrySerializer
+
 
 class StartupProfileCreateView(CreateAPIView):
     """
@@ -129,12 +144,17 @@ class SaveProjectView(APIView):
     Endpoint for saving a project for an investor.
     """
 
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         investor_id = request.data.get("investor_id")
         if not investor_id:
             return Response({"detail": "investor_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         investor = get_object_or_404(InvestorProfile, id=investor_id)
+
+        if investor.user_id != request.user:
+            return Response({"detail": "You cannot save projects for another investor."}, status=status.HTTP_403_FORBIDDEN)
 
         project_id = request.data.get("project_id")
         if not project_id:
@@ -164,14 +184,23 @@ class SavedProjectListView(generics.ListAPIView):
 
     def get_queryset(self):
         investor_id = self.request.query_params.get("investor_id")
-        investor = get_object_or_404(InvestorProfile, id=investor_id)
-        return SavedProject.objects.filter(investor=investor)
+
+        if investor_id:
+            investor = get_object_or_404(InvestorProfile, id=investor_id)
+            if investor.user_id != self.request.user:
+                return SavedProject.objects.none()
+        else:
+            investor = get_object_or_404(InvestorProfile, user_id=self.request.user)
+
+        return SavedProject.objects.filter(investor=investor).order_by("-id")
 
 
 class UnsaveProjectView(APIView):
     """
     API endpoint to remove a saved project for an investor.
     """
+
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request):
         investor_id = request.query_params.get("investor_id")
@@ -184,10 +213,13 @@ class UnsaveProjectView(APIView):
         if not saved_project_id:
             return Response({"detail": "saved_project_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+        investor = get_object_or_404(InvestorProfile, id=investor_id)
 
-        saved = SavedProject.objects.filter(id=saved_project_id).first()
+        if investor.user_id != request.user:
+            return Response({"detail": "You cannot modify saved projects for another investor."}, status=status.HTTP_403_FORBIDDEN)
+
+        saved = SavedProject.objects.filter(id=saved_project_id, investor=investor).first()
         if not saved:
             return Response({"detail": "Project not saved"}, status=status.HTTP_404_NOT_FOUND)
-
         saved.delete()
         return Response({"detail": "Project unsaved"}, status=status.HTTP_204_NO_CONTENT)

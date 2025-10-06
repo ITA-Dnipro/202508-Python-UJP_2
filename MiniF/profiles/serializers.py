@@ -40,7 +40,7 @@ class InvestorProfileSerializer(serializers.ModelSerializer):
 
 
 class IndustrySerializer(serializers.ModelSerializer):
-    """Serializer for IndustryProfile model."""
+    """Serializer for Industry model."""
 
     class Meta:
         model = Industry

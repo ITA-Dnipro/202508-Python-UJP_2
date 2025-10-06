@@ -16,16 +16,16 @@ class ChatRoomSerializer(serializers.ModelSerializer):
         fields = ["id", "investor", "startup", "created_at"]
 
 
-class MessageSerializer(serializers.ModelSerializer):
+class MessageSerializer(serializers.Serializer):
     """Serializer for Message model with sender and receiver usernames."""
 
     sender_username = serializers.SerializerMethodField()
     receiver_username = serializers.SerializerMethodField()
     room_id = serializers.IntegerField()
-
-    class Meta:
-        model = Message
-        fields = ["id", "room_id", "sender_username", "receiver_username", "content", "timestamp"]
+    sender_id = serializers.IntegerField()
+    receiver_id = serializers.IntegerField()
+    content = serializers.CharField()
+    timestamp = serializers.DateTimeField(read_only=True)
 
     def get_sender_username(self, obj):
         """Retrieve the username of the sender."""
