@@ -6,7 +6,7 @@ from .views import (
     IndustryViewSet,
     SaveProjectView,
     SavedProjectListView,
-    UnsaveProjectView
+    UnsaveProjectView,
     StartupSearchViewSet,
 )
 router = DefaultRouter()
