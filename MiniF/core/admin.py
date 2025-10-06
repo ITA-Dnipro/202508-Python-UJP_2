@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from users.models import UserProfile
+from profiles.models import InvestorProfile, SavedProject, StartupProfile, Industry
 from reversion.admin import VersionAdmin
 from notifications.models import Notification, NotificationType
-from profiles.models import InvestorProfile, StartupProfile, Industry
 from projects.models import StartupProject
-from users.models import UserProfile
 
 
 @admin.register(StartupProject)
@@ -29,6 +29,7 @@ class UserProfileAdmin(UserAdmin):
 admin.site.register(StartupProfile)
 admin.site.register(Industry)
 admin.site.register(InvestorProfile)
+admin.site.register(SavedProject)
 admin.site.register(Notification)
 admin.site.register(NotificationType)
 
