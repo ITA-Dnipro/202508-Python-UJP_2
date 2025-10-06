@@ -1,6 +1,9 @@
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from rest_framework import serializers
 from .models import StartupProfile, InvestorProfile, SavedProject, Industry
 from projects.serializers import StartupProjectSerializer
+from .documents import StartupDocument
+
 
 
 class StartupProfileSerializer(serializers.ModelSerializer):
@@ -119,3 +122,16 @@ class SavedProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = SavedProject
         fields = ["id", "project", "created_at"]
+
+
+class StartupDocumentSerializer(DocumentSerializer):
+    """Serializer for StartupDocument model"""
+
+    class Meta:
+        document = StartupDocument
+        fields = (
+            "company_name",
+            "description",
+            "location",
+            "industry_name",
+        )

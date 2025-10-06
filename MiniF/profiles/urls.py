@@ -7,8 +7,8 @@ from .views import (
     SaveProjectView,
     SavedProjectListView,
     UnsaveProjectView
+    StartupSearchViewSet,
 )
-
 router = DefaultRouter()
 router.register(r"startup-profiles", StartupProfileViewSet, basename="startupprofile")
 router.register(r"investor-profiles", InvestorProfileViewSet, basename="investorprofile")
@@ -19,4 +19,5 @@ urlpatterns = [
     path("investor/saved-projects/", SavedProjectListView.as_view(), name="saved-projects"),
     path("investor/saved-projects/unsave/", UnsaveProjectView.as_view(), name="unsave-project"),
     path("investor/save-project/", SaveProjectView.as_view(), name="save-project"),
+    path('search/', StartupSearchViewSet.as_view({'get': 'list'}), name='startup-search'),
 ]
