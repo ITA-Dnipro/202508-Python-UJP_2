@@ -1,6 +1,9 @@
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from rest_framework import serializers
-from .models import StartupProfile, InvestorProfile
+from .models import StartupProfile, InvestorProfile, SavedProject
 from projects.serializers import StartupProjectSerializer
+from .documents import StartupDocument
+
 
 
 class StartupProfileSerializer(serializers.ModelSerializer):
@@ -100,3 +103,24 @@ class InvestorProfileUpdateSerializer(serializers.ModelSerializer):
             "investment_focus": {"required": False},
             "location": {"required": False},
         }
+
+
+class SavedProjectSerializer(serializers.ModelSerializer):
+    project = StartupProjectSerializer(read_only=True)
+
+    class Meta:
+        model = SavedProject
+        fields = ["id", "project", "created_at"]
+
+
+class StartupDocumentSerializer(DocumentSerializer):
+    """Serializer for StartupDocument model"""
+
+    class Meta:
+        document = StartupDocument
+        fields = (
+            "company_name",
+            "description",
+            "location",
+            "industry_name",
+        )

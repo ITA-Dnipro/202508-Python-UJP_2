@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+
 class StartupProject(models.Model):
     """
     Startup project model.
@@ -8,7 +9,8 @@ class StartupProject(models.Model):
     Notes:
     - Added default=0 to the likes field.
     """
-    startup_profile_id = models.ForeignKey('profiles.StartupProfile', on_delete=models.CASCADE)
+
+    startup_profile_id = models.ForeignKey("profiles.StartupProfile", on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     likes = models.IntegerField(default=0)
     description = models.TextField()
