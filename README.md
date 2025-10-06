@@ -29,6 +29,12 @@ We are committed to delivering a platform that is not just a marketplace for ide
 ### Database schema
 <img width="884" height="783" alt="Screenshot_db" src="https://github.com/user-attachments/assets/50575ba4-a772-4625-8ad3-a7343e90cea2" />
 
+
+### Comment Micro-Service:
+<img width="1456" height="530" alt="image" src="https://github.com/user-attachments/assets/bd08323a-1461-4650-9683-648315e8173a" />
+<img width="2138" height="341" alt="image" src="https://github.com/user-attachments/assets/547ab9e1-f5f7-4bdc-88df-a79661958785" />
+
+
 ### Basic Epics
 
 0. **As a user of the platform**, I want the ability to represent both as a startup and as an investor company, so that I can engage in the platform's ecosystem from both perspectives using a single account.
