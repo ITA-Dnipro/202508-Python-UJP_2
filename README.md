@@ -31,7 +31,25 @@ We are committed to delivering a platform that is not just a marketplace for ide
 
 
 ### Comment Micro-Service:
+
+API Gateway: routes, can do rate-limit, auth pass-through.
+
+Comments Service: REST API (FastAPI / Flask).
+
+Auth Service: token validation; can integrate with central auth (JWT).
+
+Projects Service: project_id validation.
+
+DB: PostgreSQL for comments.
+
+MQ: event publishing for notifications, analytics, search index.
+
+**1st: Sequence diagram**
+
 <img width="1456" height="530" alt="image" src="https://github.com/user-attachments/assets/bd08323a-1461-4650-9683-648315e8173a" />
+
+**2nd: Component diagram**
+
 <img width="2138" height="341" alt="image" src="https://github.com/user-attachments/assets/547ab9e1-f5f7-4bdc-88df-a79661958785" />
 
 
