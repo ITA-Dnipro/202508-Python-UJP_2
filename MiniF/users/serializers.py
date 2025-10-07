@@ -59,6 +59,22 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for UserProfile model.
+    """
+
+    class Meta:
+        model = UserProfile
+        fields = ["id", "email", "first_name", "last_name", "user_phone"]
+
+    def save(self, request=None, *args, **kwargs):
+        """
+        Swallow the positional 'request' passed by dj-rest-auth and delegate to the parent.
+        """
+        return super().save(**kwargs)
+
+
 class PasswordResetConfirmSerializer(serializers.Serializer):
     """
     Custom password reset confirm via uid/token + new passwords.

@@ -1,8 +1,8 @@
 from pathlib import Path
 import environ
-import os
 from datetime import timedelta
 import mongoengine
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,10 +26,11 @@ INSTALLED_APPS = [
     "daphne",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "django_elasticsearch_dsl",
+    "django_elasticsearch_dsl_drf",
 
     "rest_framework",
     "rest_framework.authtoken",
-
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -37,12 +38,14 @@ INSTALLED_APPS = [
     "dj_rest_auth.registration",
     'rest_framework_simplejwt.token_blacklist',
     "rest_framework_simplejwt",
+    "reversion",
     "core",
     "users",
     "communications",
     "dashboard",
     "profiles",
     "projects",
+    "drf_yasg",
     "notifications",
 ]
 
@@ -96,6 +99,17 @@ CHANNEL_LAYERS = {
     },
 }
 mongoengine.connect(host=env("MONGO_URI"))
+
+ELASTICSEARCH_DSL = {
+
+    'default': {
+
+        'hosts': 'http://elasticsearch:9200'
+
+    },
+
+}
+
 LANGUAGE_CODE = env("LANGUAGE_CODE")
 TIME_ZONE = env("TIME_ZONE")
 USE_I18N = True
@@ -130,9 +144,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 
@@ -185,12 +198,12 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["console", "file"],
+            "handlers": ["file"],
             "level": "DEBUG",
             "propagate": True,
         },
         "django.db.backends": {
-            "handlers": ["console", "file"],
+            "handlers": ["file"],
             "level": "INFO",
             "propagate": False,
         },
@@ -220,4 +233,16 @@ LOGGING = {
             "propagate": True,
         },
     }
+}
+
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization",
+            "description": "Введи JWT токен у форматі: Bearer <your_token>",
+        }
+    },
+    "USE_SESSION_AUTH": False,
 }
