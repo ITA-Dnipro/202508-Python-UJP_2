@@ -1,50 +1,78 @@
-<!-- chat/templates/chat/room.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Room</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #chatBox { border: 1px solid #ccc; height: 400px; overflow-y: auto; padding: 10px; margin-bottom: 10px; }
+        #messageInput { width: 70%; padding: 10px; }
+        #sendButton { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        #sendButton:hover { background-color: #45a049; }
+    </style>
 </head>
 <body>
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br>
-    <input id="chat-message-input" type="text" size="100"><br>
-    <input id="chat-message-submit" type="button" value="Send">
-    {{ room_name|json_script:"room-name" }}
+    <div id="chatBox"></div>
+    <input type="text" id="messageInput" placeholder="Type a message...">
+    <button id="sendButton">Send</button>
+    <div id="status"></div>
+
     <script>
-        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        // Get query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('roomId');
+        const token = urlParams.get('token');
+        const username = urlParams.get('username');
 
-        const chatSocket = new WebSocket(
-            'ws://'
-            + window.location.host
-            + '/ws/chat/'
-            + roomName
-            + '/'
-        );
+        if (!roomId || !token || !username) {
+            document.getElementById('status').innerText = 'Invalid session. Please login again.';
+            document.getElementById('status').style.color = 'red';
+            setTimeout(() => window.location.href = 'index.html', 2000);
+            throw new Error('Missing parameters');
+        }
 
-        chatSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (data.message + '\n');
+        // WebSocket connection
+        const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomId}/?token=${token}`);
+
+        ws.onopen = () => {
+            document.getElementById('status').innerText = 'Connected to chat!';
+            document.getElementById('status').style.color = 'green';
         };
 
-        chatSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const chatBox = document.getElementById('chatBox');
+            const messageDiv = document.createElement('div');
+            messageDiv.innerText = `${data.sender}: ${data.message}`;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest
         };
 
-        document.querySelector('#chat-message-input').focus();
-        document.querySelector('#chat-message-input').onkeyup = function(e) {
-            if (e.key === 'Enter') {  // enter, return
-                document.querySelector('#chat-message-submit').click();
+        ws.onerror = (error) => {
+            document.getElementById('status').innerText = 'WebSocket error: ' + error;
+            document.getElementById('status').style.color = 'red';
+        };
+
+        ws.onclose = () => {
+            document.getElementById('status').innerText = 'Disconnected from chat.';
+            document.getElementById('status').style.color = 'red';
+        };
+
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const message = document.getElementById('messageInput').value;
+            if (message) {
+                ws.send(JSON.stringify({ message: message }));
+                document.getElementById('messageInput').value = '';
             }
-        };
+        });
 
-        document.querySelector('#chat-message-submit').onclick = function(e) {
-            const messageInputDom = document.querySelector('#chat-message-input');
-            const message = messageInputDom.value;
-            chatSocket.send(JSON.stringify({
-                'message': message
-            }));
-            messageInputDom.value = '';
-        };
+        // Allow sending with Enter key
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('sendButton').click();
+            }
+        });
     </script>
 </body>
 </html>
