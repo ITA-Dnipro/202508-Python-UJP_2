@@ -1,8 +1,10 @@
 import logging
 from django.db import IntegrityError
+from django.db.models import F
 from django.forms import ValidationError
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
-from rest_framework import viewsets, filters, generics, status
+from rest_framework import filters, generics, status, viewsets
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -13,6 +15,7 @@ from django_elasticsearch_dsl_drf.filter_backends import (
     SearchFilterBackend,
 )
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
+from users.permissions import IsInvestorRole
 from projects.models import StartupProject
 from .models import StartupProfile, InvestorProfile, Industry, SavedProject
 from .documents import StartupDocument
@@ -27,10 +30,7 @@ from .serializers import (
     SavedProjectSerializer,
     StartupDocumentSerializer,
 )
-from django.http import JsonResponse
-from users.permissions import IsInvestorRole
-import logging
-from django.db.models import F
+
 
 logger = logging.getLogger(__name__)
 
