@@ -1,0 +1,390 @@
+{
+  "version": 3,
+  "extra_config": {
+    "github_com/devopsfaith/krakend-cors": {
+      "allow_origins": ["*"],
+      "allow_methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "allow_headers": ["Origin", "Authorization", "Content-Type"]
+    },
+    "github_com/devopsfaith/krakend-ratelimit/jwt": {
+      "max_rate": 100,
+      "client_max_rate": 50
+    },
+    "github_com/devopsfaith/krakend-jwt-validator": {
+      "secret": "$ENV:SECRET_KEY",
+      "alg": "HS256"
+    }
+  },
+  "endpoints": [
+    {
+      "endpoint": "/api/schema/swagger/",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/api/schema/swagger/",
+          "host": ["http://web:8000"],
+          "method": "GET"
+        }
+      ]
+    },
+
+    {
+      "endpoint": "/api/users/auth/login/",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/api/users/auth/login/",
+          "host": ["http://web:8000"],
+          "method": "POST"
+        }
+      ]
+    },
+
+    {
+      "endpoint": "/api/users/auth/registration/",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/api/users/auth/registration/",
+          "host": ["http://web:8000"],
+          "method": "POST"
+        }
+      ]
+    },
+
+    {
+      "endpoint": "/api/users/auth/account-confirm-email/{key}",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/api/users/auth/account-confirm-email/{key}",
+          "host": ["http://web:8000"],
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/users/auth/password/reset/confirm/{uidb64}/{token}",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/api/users/auth/password/reset/confirm/{uidb64}/{token}",
+          "host": ["http://web:8000"],
+          "method": "GET"
+        }
+      ]
+    },
+
+    {
+      "endpoint": "/api/projects/startup-project-search",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/api/projects/startup-project-search/",
+          "host": ["http://web:8000"],
+          "method": "GET"
+        }
+      ]
+    },
+
+    {
+      "endpoint": "/api/profiles/search",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/api/profiles/search/",
+          "host": ["http://web:8000"],
+          "method": "GET"
+        }
+      ]
+    },
+
+    {
+      "endpoint": "/api/profiles/investor/saved-projects",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/api/profiles/investor/saved-projects/",
+          "host": ["http://web:8000"],
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/profiles/investor/save-project",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/api/profiles/investor/save-project/",
+          "host": ["http://web:8000"],
+          "method": "POST"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/profiles/investor/saved-projects/unsave",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/api/profiles/investor/saved-projects/unsave/",
+          "host": ["http://web:8000"],
+          "method": "POST"
+        }
+      ]
+    },
+
+    {
+      "endpoint": "/api/users/{path}",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/api/users/{path}",
+          "host": ["http://web:8000"],
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/users/{path}",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/api/users/{path}",
+          "host": ["http://web:8000"],
+          "method": "POST"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/users/{path}",
+      "method": "PUT",
+      "backend": [
+        {
+          "url_pattern": "/api/users/{path}",
+          "host": ["http://web:8000"],
+          "method": "PUT"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/users/{path}",
+      "method": "DELETE",
+      "backend": [
+        {
+          "url_pattern": "/api/users/{path}",
+          "host": ["http://web:8000"],
+          "method": "DELETE"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/users/{path}",
+      "method": "PATCH",
+      "backend": [
+        {
+          "url_pattern": "/api/users/{path}",
+          "host": ["http://web:8000"],
+          "method": "PATCH"
+        }
+      ]
+    },
+
+    {
+      "endpoint": "/api/profiles/{path}",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/api/profiles/{path}",
+          "host": ["http://web:8000"],
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/profiles/{path}",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/api/profiles/{path}",
+          "host": ["http://web:8000"],
+          "method": "POST"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/profiles/{path}",
+      "method": "PUT",
+      "backend": [
+        {
+          "url_pattern": "/api/profiles/{path}",
+          "host": ["http://web:8000"],
+          "method": "PUT"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/profiles/{path}",
+      "method": "DELETE",
+      "backend": [
+        {
+          "url_pattern": "/api/profiles/{path}",
+          "host": ["http://web:8000"],
+          "method": "DELETE"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/profiles/{path}",
+      "method": "PATCH",
+      "backend": [
+        {
+          "url_pattern": "/api/profiles/{path}",
+          "host": ["http://web:8000"],
+          "method": "PATCH"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/projects/{path}",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/api/projects/{path}",
+          "host": ["http://web:8000"],
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/projects/{path}",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/api/projects/{path}",
+          "host": ["http://web:8000"],
+          "method": "POST"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/projects/{path}",
+      "method": "PUT",
+      "backend": [
+        {
+          "url_pattern": "/api/projects/{path}",
+          "host": ["http://web:8000"],
+          "method": "PUT"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/projects/{path}",
+      "method": "DELETE",
+      "backend": [
+        {
+          "url_pattern": "/api/projects/{path}",
+          "host": ["http://web:8000"],
+          "method": "DELETE"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/projects/{path}",
+      "method": "PATCH",
+      "backend": [
+        {
+          "url_pattern": "/api/projects/{path}",
+          "host": ["http://web:8000"],
+          "method": "PATCH"
+        }
+      ]
+    },
+    {
+      "endpoint": "/chat/api/{path}",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/chat/api/{path}",
+          "host": ["http://web:8000"],
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "endpoint": "/chat/api/{path}",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/chat/api/{path}",
+          "host": ["http://web:8000"],
+          "method": "POST"
+        }
+      ]
+    },
+    {
+      "endpoint": "/chat/api/{path}",
+      "method": "PUT",
+      "backend": [
+        {
+          "url_pattern": "/chat/api/{path}",
+          "host": ["http://web:8000"],
+          "method": "PUT"
+        }
+      ]
+    },
+    {
+      "endpoint": "/chat/api/{path}",
+      "method": "DELETE",
+      "backend": [
+        {
+          "url_pattern": "/chat/api/{path}",
+          "host": ["http://web:8000"],
+          "method": "DELETE"
+        }
+      ]
+    },
+    {
+      "endpoint": "/chat/api/{path}",
+      "method": "PATCH",
+      "backend": [
+        {
+          "url_pattern": "/chat/api/{path}",
+          "host": ["http://web:8000"],
+          "method": "PATCH"
+        }
+      ]
+    },
+
+    {
+      "endpoint": "/chat/{path}",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/chat/{path}",
+          "host": ["http://web:8000"],
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "endpoint": "/ws/chat/{room_id}",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/ws/chat/{room_id}/",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "extra_config": {
+            "github_com/devopsfaith/krakend-websocket": {
+              "read_buffer_size": 1024
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "timeout": "3s",
+  "cache_ttl": "300s",
+  "output_encoding": "json",
+  "port": 8080
+}
