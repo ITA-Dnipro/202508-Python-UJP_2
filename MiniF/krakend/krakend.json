@@ -76,7 +76,7 @@
     },
 
     {
-      "endpoint": "/api/projects/startup-project-search",
+      "endpoint": "/api/projects/startup-project-search/",
       "method": "GET",
       "backend": [
         {
