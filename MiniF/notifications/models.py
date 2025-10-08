@@ -17,11 +17,6 @@ class Notification(models.Model):
     """
     Model for notifications.
     """
-    recipient = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='notifications'
-    )
     investor = models.ForeignKey(
         InvestorProfile,
         on_delete=models.SET_NULL,
@@ -48,8 +43,8 @@ class Notification(models.Model):
     class Meta:
         ordering = ['-created_at']
         indexes = [
-            models.Index(fields=['recipient', 'is_read']),
+            models.Index(fields=['investor', 'is_read']),
         ]
 
     def __str__(self):
-        return f"Notification for {self.recipient.username}: {self.notification_type.type if self.notification_type else 'No Type'}"
+        return f"Notification for {self.investor.user_id.username}: {self.notification_type.name if self.notification_type else 'No Type'}"

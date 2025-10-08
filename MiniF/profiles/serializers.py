@@ -1,6 +1,9 @@
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from rest_framework import serializers
-from .models import StartupProfile, InvestorProfile, SavedProject
+from .models import StartupProfile, InvestorProfile, SavedProject, Industry
 from projects.serializers import StartupProjectSerializer
+from .documents import StartupDocument
+
 
 
 class StartupProfileSerializer(serializers.ModelSerializer):
@@ -27,13 +30,24 @@ class StartupProfileSerializer(serializers.ModelSerializer):
         ]
 
     def validate_company_name(self, value):
-        """
-        Ensure company name is not empty.
-        """
-        if not value:
-            raise serializers.ValidationError("Company name cannot be empty.")
-        return value
+         if not value:
+             raise serializers.ValidationError("Company name cannot be empty.")
+         return value
 
+class InvestorProfileSerializer(serializers.ModelSerializer):
+    """Serializer for InvestorProfile model."""
+
+    class Meta:
+        model = InvestorProfile
+        fields = ["id", "user_id", "investment_focus", "location", "created_at", "updated_at"]
+
+
+class IndustrySerializer(serializers.ModelSerializer):
+    """Serializer for Industry model."""
+
+    class Meta:
+        model = Industry
+        fields = "__all__"
 
 class StartupProfileCreateSerializer(serializers.ModelSerializer):
     """
@@ -108,3 +122,16 @@ class SavedProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = SavedProject
         fields = ["id", "project", "created_at"]
+
+
+class StartupDocumentSerializer(DocumentSerializer):
+    """Serializer for StartupDocument model"""
+
+    class Meta:
+        document = StartupDocument
+        fields = (
+            "company_name",
+            "description",
+            "location",
+            "industry_name",
+        )

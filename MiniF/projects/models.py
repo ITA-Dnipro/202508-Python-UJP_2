@@ -16,4 +16,7 @@ class StartupProject(models.Model):
     description = models.TextField()
     status = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(null=True, auto_now=True)
+
+    def __str__(self):
+        return self.title

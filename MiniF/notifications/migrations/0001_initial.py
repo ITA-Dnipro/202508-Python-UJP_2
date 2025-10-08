@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("profiles", "0005_savedproject_savedproject_unique_investor_project"),
+        ("profiles", "0006_merge_20251003_1242"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
