@@ -99,6 +99,9 @@ class StartupProjectViewSet(viewsets.ModelViewSet):
         return qs
 
     def update(self, request, *args, **kwargs):
+        """
+        Updating a table in the database when a change occurs in the project
+        """
         response = super().update(request, *args, **kwargs)
 
         project = self.get_object()
