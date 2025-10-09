@@ -17,6 +17,8 @@ from .serializers import (
 )
 from .documents import StartupDocument
 from .serializers import StartupDocumentSerializer
+from notifications.models import Notification, NotificationType
+from profiles.models import InvestorProfile, SavedProject
 
 logger = logging.getLogger(__name__)
 
@@ -95,3 +97,31 @@ class StartupProjectViewSet(viewsets.ModelViewSet):
         if startup_id:
             qs = qs.filter(startup_profile_id=startup_id)
         return qs
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+
+        project = self.get_object()
+
+        investor_ids = SavedProject.objects.filter(project=project).values_list("investor_id", flat=True)
+        if not investor_ids:
+            return response
+
+        investors = InvestorProfile.objects.filter(id__in=investor_ids)
+
+        notif_type, _ = NotificationType.objects.get_or_create(name="project_updated")
+
+        msg = f"Проєкт «{project.title}» було оновлено."
+
+        notifications = [
+            Notification(
+                investor=inv,
+                startup=project.startup_profile_id,
+                notification_type=notif_type,
+                message=msg,
+            )
+            for inv in investors
+        ]
+        Notification.objects.bulk_create(notifications)
+
+        return response
