@@ -84,6 +84,21 @@ jobs:
             --health-retries=5
 
 
+        elasticsearch: 
+          image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+          env:
+            discovery.type: single-node
+            xpack.security.enabled: false
+            ES_JAVA_OPTS: -Xms512m -Xmx512m
+          ports:
+            - 9200:9200
+          options: >-
+            --health-cmd="curl -f http://localhost:9200/_cluster/health?wait_for_status=yellow"
+            --health-interval=10s
+            --health-timeout=5s
+            --health-retries=10
+
+
       env:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         DJANGO_SETTINGS_MODULE: MiniF.settings
@@ -97,6 +112,7 @@ jobs:
         EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
         EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
         DEFAULT_FROM_EMAIL: ${{ secrets.DEFAULT_FROM_EMAIL }}
+        ELASTICSEARCH_URL: http://localhost:9200
 
       steps:
         - name: Checkout repository

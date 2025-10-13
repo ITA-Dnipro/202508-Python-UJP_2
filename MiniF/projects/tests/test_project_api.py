@@ -1,14 +1,21 @@
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
 from rest_framework import status
 from users.models import UserProfile
 from profiles.models import StartupProfile, Industry
 from ..models import StartupProject
+from django.urls import reverse
 
 
 class StartupProjectAPITest(APITestCase):
+    """A test suite for the StartupProject API."""
+
     def setUp(self):
+        """Initialize test data before each test."""
         self.user = UserProfile.objects.create_user(
-            email="test@example.com", username="testuser", user_phone="+380123456789", password="testpassword"
+            email="test@example.com",
+            username="testuser",
+            user_phone="+380123456789",
+            password="testpassword"
         )
         self.industry = Industry.objects.create(industry_name="TechIndustry")
         self.startup = StartupProfile.objects.create(
@@ -19,17 +26,16 @@ class StartupProjectAPITest(APITestCase):
             industry_id=self.industry,
             location="Kyiv",
         )
-        self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
-        self.list_url = "/api/projects/"
-        self.detail_url = lambda pk: f"/api/projects/{pk}/"
+        self.list_url = reverse("startupproject-list")
+        self.detail_url = lambda pk: reverse("startupproject-detail", kwargs={'pk': pk})
 
     def test_create_project(self):
+        """Test creating a new startup project via API."""
         data = {
             "startup_profile_id": self.startup.id,
             "title": "Project Alpha",
-            "likes": 10,
             "description": "Project description",
             "status": "Active",
         }
@@ -38,10 +44,10 @@ class StartupProjectAPITest(APITestCase):
         self.assertEqual(response.data["title"], "Project Alpha")
 
     def test_get_project_list(self):
+        """Test retrieving a list of all startup projects."""
         StartupProject.objects.create(
             startup_profile_id=self.startup,
             title="Project Beta",
-            likes=5,
             description="Another project",
             status="Active",
         )
@@ -50,10 +56,10 @@ class StartupProjectAPITest(APITestCase):
         self.assertEqual(len(response.data), 1)
 
     def test_get_project_detail(self):
+        """Test retrieving the details of a specific startup project."""
         project = StartupProject.objects.create(
             startup_profile_id=self.startup,
             title="Project Gamma",
-            likes=2,
             description="Gamma project",
             status="Inactive",
         )
@@ -62,30 +68,28 @@ class StartupProjectAPITest(APITestCase):
         self.assertEqual(response.data["title"], "Project Gamma")
 
     def test_update_project(self):
+        """Test updating a startup project's data."""
         project = StartupProject.objects.create(
             startup_profile_id=self.startup,
             title="Project Delta",
-            likes=0,
             description="Delta project",
             status="Active",
         )
         data = {
             "startup_profile_id": self.startup.id,
-            "title": "Project Alpha",
-            "likes": 15,
-            "description": "Project description",
+            "title": "Project Delta Updated",
+            "description": "Updated description",
             "status": "Completed",
         }
         response = self.client.put(self.detail_url(project.id), data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["likes"], 15)
         self.assertEqual(response.data["status"], "Completed")
 
     def test_delete_project(self):
+        """Test deleting a startup project."""
         project = StartupProject.objects.create(
             startup_profile_id=self.startup,
             title="Project Epsilon",
-            likes=3,
             description="Epsilon project",
             status="Active",
         )
