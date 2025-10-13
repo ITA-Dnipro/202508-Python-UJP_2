@@ -104,7 +104,7 @@ ELASTICSEARCH_DSL = {
 
     'default': {
 
-        'hosts': 'http://elasticsearch:9200'
+        'hosts': os.getenv('ELASTICSEARCH_URL', 'http://elasticsearch:9200')
 
     },
 
