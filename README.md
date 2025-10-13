@@ -86,4 +86,61 @@ We are committed to delivering a platform that is not just a marketplace for ide
 - Regular feedback from both user groups (startups and investors) should be incorporated.
 
 
+## Database Migration Process
 
+### Creating Migrations 
+
+After making changes to Django models, create new migration files:
+
+```bash
+python manage.py makemigrations
+```
+
+### Applying Migrations
+
+Apply migrations to update the database schema:
+
+```bash
+python manage.py migrate
+```
+
+### Verifying Migration Consistency
+
+Before pushing changes, check that all model changes are reflected in migrations:
+
+```bash
+python manage.py makemigrations --check
+```
+
+This command will fail if there are unapplied model changes.
+
+### Resolving Migration Conflicts or Inconsistencies
+
+If migration files are outdated, duplicated, or broken:
+1. Delete all migration files (`*.py`) in each app’s `migrations/` folder, except `__init__.py`.
+2. Generate new initial migrations:
+
+    ```bash
+    python manage.py makemigrations
+    ```
+
+3. Apply migrations with:
+
+    ```bash
+    python manage.py migrate --fake-initial
+    ```
+
+### Automated Checks
+
+CI runs the following checks to ensure migration consistency:
+
+```bash
+python manage.py makemigrations --check
+python manage.py migrate --noinput
+```
+
+### Best Practices
+
+- Do not manually edit migration files.
+- Always commit migration files with model changes.
+- Coordinate major migration resets with the team.
