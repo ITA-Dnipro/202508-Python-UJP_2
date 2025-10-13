@@ -32,10 +32,15 @@ We are committed to delivering a platform that is not just a marketplace for ide
 ### Gamification Micro-Service
 
 **Storage:** PostgreSQL (tables for EXP, badges, levels, leaderboards).
+
 **Caching:** Redis for leaderboard performance.
+
 **Event Processing:** Consume platform events (e.g., “project.created”, “investment.made”, “comment.added”) via message queue (RabbitMQ/Kafka).
+
 **API Layer:** REST endpoints for retrieving user stats, badges, levels, and leaderboards.
+
 **Admin Config:** Internal API for adjusting XP values, thresholds, and badge rules.
+
 **Security:** JWT-authenticated endpoints; actions verified by user ID and role.
 
 <img width="1075" height="1023" alt="micros drawio" src="https://github.com/user-attachments/assets/7b555187-359d-4979-bb8a-58e32f750899" />
