@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.password_validation import validate_password
@@ -13,10 +14,11 @@ from dj_rest_auth.serializers import (
 
 from .models import UserProfile
 from profiles.models import StartupProfile, InvestorProfile
+from .tasks import send_welcome_email
 
 
 User = get_user_model()
-
+logger = logging.getLogger(__name__)
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
@@ -56,6 +58,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             last_name=data.get("last_name", ""),
             user_phone=data.get("user_phone"),
         )
+    
+        try:
+                logger.info(f"Triggering welcome email for new user: {user.email}")
+                send_welcome_email.delay(user.id)
+        except Exception as e:
+                logger.error(f"Failed to trigger welcome email for {user.email}: {e}")
+        
         return user
 
 
@@ -128,6 +137,12 @@ class CustomLoginSerializer(serializers.Serializer):
         if not user:
             raise serializers.ValidationError("Invalid credentials")
 
+        try:
+            logger.info(f"Triggering welcome email for logged in user: {user.email}")
+            send_welcome_email.delay(user.id)
+        except Exception as e:
+            logger.error(f"Failed to trigger welcome email for {user.email}: {e}")
+        
         if role == "startup" and not StartupProfile.objects.filter(user_id=user.id).exists():
             raise serializers.ValidationError("User is not a startup.")
         if role == "investor" and not InvestorProfile.objects.filter(user_id=user.id).exists():
