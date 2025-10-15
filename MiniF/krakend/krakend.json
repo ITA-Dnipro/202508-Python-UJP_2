@@ -1,4 +1,5 @@
 {
+  "$schema": "https://www.krakend.io/schema/krakend.json",
   "version": 3,
   "extra_config": {
     "router": {
@@ -12,258 +13,244 @@
       "format": "default"
     },
     "security/cors": {
-          "allow_origins": [
-            "*"
-          ],
-          "allow_methods": [
-            "GET",
-            "POST",
-            "DELETE"
-          ],
-          "expose_headers": [
-            "Content-Length",
-            "Content-Type",
-            "Authorization"
-          ],
-          "allow_headers": [
-            "Accept-Language",
-            "Authorization",
-            "Content-Type"
-          ],
-          "max_age": "12h",
-          "allow_credentials": true,
-          "debug": false
+      "allow_origins": ["*"],
+      "allow_methods": ["GET", "POST", "PUT", "DELETE"],
+      "expose_headers": ["Content-Length", "Content-Type", "Authorization"],
+      "allow_headers": ["Accept-Language", "Authorization", "Content-Type"],
+      "max_age": "12h",
+      "allow_credentials": true,
+      "debug": false
     }
   },
   "endpoints": [
     {
-      "endpoint": "/api/users/{path}",
+      "endpoint": "/api/users/auth/confirm-token/",
       "method": "GET",
       "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/users/auth/confirm-token/",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "encoding": "json",
+          "extra_config": {
+            "proxy": {
+              "flatmap_filter": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/users/auth/login/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "host": ["http://web:8000"],
+          "url_pattern": "/api/users/auth/login/",
+          "method": "POST",
+          "encoding": "json",
+          "extra_config": {
+            "proxy": {
+              "flatmap_filter": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/users/auth/registration/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/users/auth/registration/",
+          "host": ["http://web:8000"],
+          "method": "POST",
+          "encoding": "json",
+          "extra_config": {
+            "proxy": {
+              "flatmap_filter": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/{rest}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": ["*"],
       "extra_config": {
-        "security/jwt": {
+        "auth/validator": {
           "alg": "HS256",
-          "secret": "${SECRET_KEY}",
-          "roles_key": "role"
+          "disable_jwk_security": true,
+          "endpoint": "/api/users/auth/confirm-token/",
+          "auth_header_name": "Authorization",
+          "token_type": "Bearer",
+          "propagate_claims": [
+            ["role", "X-User-Role"],
+            ["user_id", "X-User-Id"]
+          ],
+          "allow": ["*"]
         }
       },
       "backend": [
         {
-          "url_pattern": "/api/users/{path}",
+          "url_pattern": "/api/{rest}",
           "host": ["http://web:8000"],
           "method": "GET",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
+          "encoding": "json",
+          "is_collection": true,
           "allow": ["*"]
         }
       ]
     },
     {
-      "endpoint": "/api/users/{path}",
+      "endpoint": "/api/{rest}",
       "method": "POST",
       "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "HS256",
+          "disable_jwk_security": true,
+          "endpoint": "/api/users/auth/confirm-token/",
+          "auth_header_name": "Authorization",
+          "token_type": "Bearer",
+          "propagate_claims": [
+            ["role", "X-User-Role"],
+            ["user_id", "X-User-Id"]
+          ],
+          "allow": ["*"]
+        }
+      },
       "backend": [
         {
-          "url_pattern": "/api/users/{path}",
+          "url_pattern": "/api/{rest}",
           "host": ["http://web:8000"],
           "method": "POST",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
+          "encoding": "json",
           "allow": ["*"]
         }
       ]
     },
     {
-      "endpoint": "/api/users/{path}",
+      "endpoint": "/api/{rest}",
       "method": "PUT",
       "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "HS256",
+          "disable_jwk_security": true,
+          "endpoint": "/api/users/auth/confirm-token/",
+          "auth_header_name": "Authorization",
+          "token_type": "Bearer",
+          "propagate_claims": [
+            ["role", "X-User-Role"],
+            ["user_id", "X-User-Id"]
+          ],
+          "allow": ["*"]
+        }
+      },
       "backend": [
         {
-          "url_pattern": "/api/users/{path}",
+          "url_pattern": "/api/{rest}",
           "host": ["http://web:8000"],
           "method": "PUT",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
+          "encoding": "json",
           "allow": ["*"]
         }
       ]
     },
     {
-      "endpoint": "/api/users/{path}",
+      "endpoint": "/api/{rest}",
       "method": "DELETE",
       "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "HS256",
+          "disable_jwk_security": true,
+          "endpoint": "/api/users/auth/confirm-token/",
+          "auth_header_name": "Authorization",
+          "token_type": "Bearer",
+          "propagate_claims": [
+            ["role", "X-User-Role"],
+            ["user_id", "X-User-Id"]
+          ],
+          "allow": ["*"]
+        }
+      },
       "backend": [
         {
-          "url_pattern": "/api/users/{path}",
+          "url_pattern": "/api/{rest}",
           "host": ["http://web:8000"],
           "method": "DELETE",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
+          "encoding": "json",
           "allow": ["*"]
         }
       ]
     },
     {
-      "endpoint": "/api/profiles/{path}",
-      "method": "GET",
-      "output_encoding": "no-op",
-      "backend": [
-        {
-          "url_pattern": "/api/profiles/{path}",
-          "host": ["http://web:8000"],
-          "method": "GET",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
-          "allow": ["*"]
-        }
-      ]
-    },
-    {
-      "endpoint": "/api/profiles/{path}",
+      "endpoint": "/chat/api/{rest}",
       "method": "POST",
       "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "HS256",
+          "disable_jwk_security": true,
+          "endpoint": "/api/users/auth/confirm-token/",
+          "auth_header_name": "Authorization",
+          "token_type": "Bearer",
+          "propagate_claims": [
+            ["role", "X-User-Role"],
+            ["user_id", "X-User-Id"]
+          ],
+          "allow": ["*"]
+        }
+      },
       "backend": [
         {
-          "url_pattern": "/api/profiles/{path}",
+          "url_pattern": "/chat/api/{rest}",
           "host": ["http://web:8000"],
           "method": "POST",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
+          "encoding": "json",
           "allow": ["*"]
         }
       ]
     },
     {
-      "endpoint": "/api/profiles/{path}",
-      "method": "PUT",
-      "output_encoding": "no-op",
-      "backend": [
-        {
-          "url_pattern": "/api/profiles/{path}",
-          "host": ["http://web:8000"],
-          "method": "PUT",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
-          "allow": ["*"]
-        }
-      ]
-    },
-    {
-      "endpoint": "/api/profiles/{path}",
-      "method": "DELETE",
-      "output_encoding": "no-op",
-      "backend": [
-        {
-          "url_pattern": "/api/profiles/{path}",
-          "host": ["http://web:8000"],
-          "method": "DELETE",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
-          "allow": ["*"]
-        }
-      ]
-    },
-    {
-      "endpoint": "/api/projects/{path}",
-      "method": "GET",
-      "output_encoding": "no-op",
-      "backend": [
-        {
-          "url_pattern": "/api/projects/{path}",
-          "host": ["http://web:8000"],
-          "method": "GET",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
-          "allow": ["*"]
-        }
-      ]
-    },
-    {
-      "endpoint": "/api/projects/{path}",
+      "endpoint": "/chat/",
       "method": "POST",
       "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "HS256",
+          "disable_jwk_security": true,
+          "endpoint": "/api/users/auth/confirm-token/",
+          "auth_header_name": "Authorization",
+          "token_type": "Bearer",
+          "propagate_claims": [
+            ["role", "X-User-Role"],
+            ["user_id", "X-User-Id"]
+          ],
+          "allow": ["*"]
+        }
+      },
       "backend": [
         {
-          "url_pattern": "/api/projects/{path}",
+          "url_pattern": "/chat/",
           "host": ["http://web:8000"],
           "method": "POST",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
-          "allow": ["*"]
-        }
-      ]
-    },
-    {
-      "endpoint": "/api/projects/{path}",
-      "method": "PUT",
-      "output_encoding": "no-op",
-      "backend": [
-        {
-          "url_pattern": "/api/projects/{path}",
-          "host": ["http://web:8000"],
-          "method": "PUT",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
-          "allow": ["*"]
-        }
-      ]
-    },
-    {
-      "endpoint": "/api/projects/{path}",
-      "method": "DELETE",
-      "output_encoding": "no-op",
-      "backend": [
-        {
-          "url_pattern": "/api/projects/{path}",
-          "host": ["http://web:8000"],
-          "method": "DELETE",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
-          "allow": ["*"]
-        }
-      ]
-    },
-    {
-      "endpoint": "/chat/{path}",
-      "method": "GET",
-      "output_encoding": "no-op",
-      "backend": [
-        {
-          "url_pattern": "/chat/{path}",
-          "host": ["http://web:8000"],
-          "method": "GET",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
-          "allow": ["*"]
-        }
-      ]
-    },
-    {
-      "endpoint": "/chat/{path}",
-      "method": "POST",
-      "output_encoding": "no-op",
-      "backend": [
-        {
-          "url_pattern": "/chat/{path}",
-          "host": ["http://web:8000"],
-          "method": "POST",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
-          "allow": ["*"]
-        }
-      ]
-    },
-    {
-      "endpoint": "/api/schema/swagger/",
-      "method": "GET",
-      "output_encoding": "no-op",
-      "backend": [
-        {
-          "url_pattern": "/api/schema/swagger/",
-          "host": ["http://web:8000"],
-          "method": "GET",
-          "encoding": "no-op",
-          "whitelist": ["Authorization"],
+          "encoding": "json",
           "allow": ["*"]
         }
       ]

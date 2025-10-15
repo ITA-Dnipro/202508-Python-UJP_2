@@ -81,13 +81,13 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data
   krakend:
-    image: devopsfaith/krakend:watch
+    image: krakend
     container_name: krakend
     ports:
       - "8080:8080"   # public API Gateway port
     volumes:
       - ./krakend/krakend.json:/etc/krakend/krakend.json:ro
-    command: [ "run", "-c", "krakend.json" ]
+    command: [ "run", "-c", "/etc/krakend/krakend.json" ]
     depends_on:
       - web
       - db
