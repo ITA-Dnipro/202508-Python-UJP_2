@@ -3,4 +3,4 @@ Hi {{ user_name }},
 Welcome to our platform! We're excited to have you onboard.
 
 Best,
-The Team
+The Team MiniF
