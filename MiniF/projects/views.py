@@ -1,8 +1,8 @@
 import logging
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
@@ -59,6 +59,10 @@ class StartupProjectView(DocumentViewSet):
         'title': 'title',
     }
     ordering = ('startup_name.raw',)
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({"results": serializer.data})
 
 
 class StartupProjectViewSet(viewsets.ModelViewSet):

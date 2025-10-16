@@ -1,6 +1,5 @@
 import logging
 from django.http import JsonResponse
-from django.shortcuts import render
 from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -76,3 +75,16 @@ class PasswordResetConfirmAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
+
+class ConfirmTokenView(APIView):
+    """
+    POST /api/auth/confirm-token/
+    body: { "token": "..." }
+    """
+    def get(self, request, *args, **kwargs):
+        if not request.user or not request.user.is_authenticated:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # I need to return user id end role(if exist)
+        return Response({"user_id": request.user.id, "role": request.auth.payload.get("role") if request.auth.payload.get("role") else None}, status=status.HTTP_200_OK)
+

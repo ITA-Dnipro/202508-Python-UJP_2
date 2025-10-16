@@ -81,180 +81,96 @@
       ]
     },
     {
-      "endpoint": "/api/{rest}",
+      "endpoint": "/api/projects/startup-project-search",
       "method": "GET",
-      "output_encoding": "no-op",
+      "output_encoding": "json",
       "input_query_strings": ["*"],
-      "extra_config": {
-        "auth/validator": {
-          "alg": "HS256",
-          "disable_jwk_security": true,
-          "endpoint": "/api/users/auth/confirm-token/",
-          "auth_header_name": "Authorization",
-          "token_type": "Bearer",
-          "propagate_claims": [
-            ["role", "X-User-Role"],
-            ["user_id", "X-User-Id"]
-          ],
-          "allow": ["*"]
-        }
-      },
+      "input_headers": ["*"],
       "backend": [
         {
-          "url_pattern": "/api/{rest}",
+          "url_pattern": "/api/users/auth/confirm-token/",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "extra_config": {
+            "plugin/http": {
+              "name": "internal-call",
+              "options": {
+                "source_field": "user_id",
+                "target_header": "user_id"
+              }
+            }
+          }
+        },
+        {
+          "url_pattern": "/api/projects/startup-project-search",
           "host": ["http://web:8000"],
           "method": "GET",
           "encoding": "json",
-          "is_collection": true,
-          "allow": ["*"]
+          "allow": ["*"],
+          "extra_config": {
+            "modifier/headers": {
+              "add": {
+                "user_id": "@response0.user_id",
+                "role": "@response0.role"
+              }
+            }
+          }
         }
-      ]
+      ],
+      "extra_config": {
+        "proxy/sequential": true,
+        "proxy/error_handler": {
+          "status_code": 401,
+          "message": "Unauthorized"
+        }
+      }
     },
     {
-      "endpoint": "/api/{rest}",
-      "method": "POST",
-      "output_encoding": "no-op",
+      "endpoint": "/api/profiles/search/",
+      "method": "GET",
+      "output_encoding": "json",
       "input_query_strings": ["*"],
-      "extra_config": {
-        "auth/validator": {
-          "alg": "HS256",
-          "disable_jwk_security": true,
-          "endpoint": "/api/users/auth/confirm-token/",
-          "auth_header_name": "Authorization",
-          "token_type": "Bearer",
-          "propagate_claims": [
-            ["role", "X-User-Role"],
-            ["user_id", "X-User-Id"]
-          ],
-          "allow": ["*"]
-        }
-      },
+      "input_headers": ["*"],
       "backend": [
         {
-          "url_pattern": "/api/{rest}",
+          "url_pattern": "/api/users/auth/confirm-token/",
           "host": ["http://web:8000"],
-          "method": "POST",
-          "encoding": "json",
-          "allow": ["*"]
-        }
-      ]
-    },
-    {
-      "endpoint": "/api/{rest}",
-      "method": "PUT",
-      "output_encoding": "no-op",
-      "input_query_strings": ["*"],
-      "extra_config": {
-        "auth/validator": {
-          "alg": "HS256",
-          "disable_jwk_security": true,
-          "endpoint": "/api/users/auth/confirm-token/",
-          "auth_header_name": "Authorization",
-          "token_type": "Bearer",
-          "propagate_claims": [
-            ["role", "X-User-Role"],
-            ["user_id", "X-User-Id"]
-          ],
-          "allow": ["*"]
-        }
-      },
-      "backend": [
+          "method": "GET",
+          "extra_config": {
+            "plugin/http": {
+              "name": "internal-call",
+              "options": {
+                "source_field": "user_id",
+                "target_header": "user_id"
+              }
+            }
+          }
+        },
         {
-          "url_pattern": "/api/{rest}",
+          "url_pattern": "/api/profiles/search/",
           "host": ["http://web:8000"],
-          "method": "PUT",
+          "method": "GET",
           "encoding": "json",
-          "allow": ["*"]
+          "allow": ["*"],
+          "extra_config": {
+            "modifier/headers": {
+              "add": {
+                "user_id": "@response0.user_id",
+                "role": "@response0.role"
+              }
+            }
+          }
         }
-      ]
-    },
-    {
-      "endpoint": "/api/{rest}",
-      "method": "DELETE",
-      "output_encoding": "no-op",
-      "input_query_strings": ["*"],
+      ],
       "extra_config": {
-        "auth/validator": {
-          "alg": "HS256",
-          "disable_jwk_security": true,
-          "endpoint": "/api/users/auth/confirm-token/",
-          "auth_header_name": "Authorization",
-          "token_type": "Bearer",
-          "propagate_claims": [
-            ["role", "X-User-Role"],
-            ["user_id", "X-User-Id"]
-          ],
-          "allow": ["*"]
+        "proxy/sequential": true,
+        "proxy/error_handler": {
+          "status_code": 401,
+          "message": "Unauthorized"
         }
-      },
-      "backend": [
-        {
-          "url_pattern": "/api/{rest}",
-          "host": ["http://web:8000"],
-          "method": "DELETE",
-          "encoding": "json",
-          "allow": ["*"]
-        }
-      ]
-    },
-    {
-      "endpoint": "/chat/api/{rest}",
-      "method": "POST",
-      "output_encoding": "no-op",
-      "input_query_strings": ["*"],
-      "extra_config": {
-        "auth/validator": {
-          "alg": "HS256",
-          "disable_jwk_security": true,
-          "endpoint": "/api/users/auth/confirm-token/",
-          "auth_header_name": "Authorization",
-          "token_type": "Bearer",
-          "propagate_claims": [
-            ["role", "X-User-Role"],
-            ["user_id", "X-User-Id"]
-          ],
-          "allow": ["*"]
-        }
-      },
-      "backend": [
-        {
-          "url_pattern": "/chat/api/{rest}",
-          "host": ["http://web:8000"],
-          "method": "POST",
-          "encoding": "json",
-          "allow": ["*"]
-        }
-      ]
-    },
-    {
-      "endpoint": "/chat/",
-      "method": "POST",
-      "output_encoding": "no-op",
-      "input_query_strings": ["*"],
-      "extra_config": {
-        "auth/validator": {
-          "alg": "HS256",
-          "disable_jwk_security": true,
-          "endpoint": "/api/users/auth/confirm-token/",
-          "auth_header_name": "Authorization",
-          "token_type": "Bearer",
-          "propagate_claims": [
-            ["role", "X-User-Role"],
-            ["user_id", "X-User-Id"]
-          ],
-          "allow": ["*"]
-        }
-      },
-      "backend": [
-        {
-          "url_pattern": "/chat/",
-          "host": ["http://web:8000"],
-          "method": "POST",
-          "encoding": "json",
-          "allow": ["*"]
-        }
-      ]
+      }
     }
+
   ],
   "timeout": "3s",
   "cache_ttl": "300s",
