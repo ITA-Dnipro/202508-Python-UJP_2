@@ -3,7 +3,8 @@
   "version": 3,
   "extra_config": {
     "router": {
-      "auto_options": true
+      "auto_options": true,
+      "return_error_details": "proxy"
     },
     "telemetry/logging": {
       "level": "DEBUG",
@@ -21,6 +22,10 @@
       "allow_credentials": true,
       "debug": false
     }
+  },
+  "plugin": {
+    "pattern": ".so",
+    "folder": "/etc/krakend/plugins"
   },
   "endpoints": [
     {
@@ -86,30 +91,7 @@
       "output_encoding": "json",
       "input_query_strings": ["*"],
       "input_headers": ["*"],
-      "extra_config": {
-        "proxy/sequential": true,
-        "proxy": {
-          "flatmap_filter": [
-            { "type": "del", "args": ["role"] },
-            { "type": "del", "args": ["user_id"] }
-          ]
-        }
-      },
       "backend": [
-        {
-          "url_pattern": "/api/users/auth/confirm-token/",
-          "host": ["http://web:8000"],
-          "method": "GET",
-          "extra_config": {
-            "plugin/http": {
-              "name": "internal-call",
-              "options": {
-                "source_field": "user_id",
-                "target_header": "user_id"
-              }
-            }
-          }
-        },
         {
           "url_pattern": "/api/projects/startup-project-search",
           "host": ["http://web:8000"],
@@ -117,10 +99,10 @@
           "encoding": "json",
           "allow": ["*"],
           "extra_config": {
-            "modifier/headers": {
-              "add": {
-                "user_id": "@response0.user_id",
-                "role": "@response0.role"
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
               }
             },
             "proxy": {
@@ -138,27 +120,10 @@
     {
       "endpoint": "/api/profiles/search/",
       "method": "GET",
-      "output_encoding": "json",
+      "output_encoding": "no-op",
       "input_query_strings": ["*"],
       "input_headers": ["*"],
       "backend": [
-        {
-          "url_pattern": "/api/users/auth/confirm-token/",
-          "host": ["http://web:8000"],
-          "method": "GET",
-          "extra_config": {
-            "plugin/http": {
-              "name": "internal-call",
-              "options": {
-                "source_field": "user_id",
-                "target_header": "user_id"
-              }
-            },
-            "proxy": {
-              "flatmap_filter": []
-            }
-          }
-        },
         {
           "url_pattern": "/api/profiles/search/",
           "host": ["http://web:8000"],
@@ -166,13 +131,10 @@
           "encoding": "json",
           "allow": ["*"],
           "extra_config": {
-            "plugin/http": {
-              "name": "internal-call",
-              "options": {
-                "set_headers": {
-                  "user_id": "@response0.user_id",
-                  "role": "@response0.role"
-                }
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
               }
             }
           }

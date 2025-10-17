@@ -81,13 +81,10 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data
   krakend:
-    image: krakend
+    build: ./krakend
     container_name: krakend
     ports:
-      - "8080:8080"   # public API Gateway port
-    volumes:
-      - ./krakend/krakend.json:/etc/krakend/krakend.json:ro
-    command: [ "run", "-c", "/etc/krakend/krakend.json" ]
+      - "8080:8080"
     depends_on:
       - web
       - db
@@ -96,6 +93,8 @@ services:
       - elasticsearch
     environment:
       - KRAKEND_PORT=8080
+      - KRAKEND_PLUGINS_ENABLED=true
+      - KRAKEND_PLUGINS_DIR=/etc/krakend/plugins
     restart: unless-stopped
 
 volumes:

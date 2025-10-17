@@ -59,11 +59,6 @@ class StartupProjectView(DocumentViewSet):
         'title': 'title',
     }
     ordering = ('startup_name.raw',)
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        return Response({"results": serializer.data})
-
 
 class StartupProjectViewSet(viewsets.ModelViewSet):
     """
@@ -78,15 +73,6 @@ class StartupProjectViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["title", "description", "status"]
     ordering_fields = ["created_at", "likes"]
-    
-    def get_serializer_class(self):
-        """
-        Use an update-friendly serializer for PUT/PATCH,
-        otherwise the read serializer.
-        """
-        if self.action in ("create", "update", "partial_update"):
-            return StartupProjectCreateUpdateSerializer
-        return StartupProjectSerializer
 
 
     def get_queryset(self):

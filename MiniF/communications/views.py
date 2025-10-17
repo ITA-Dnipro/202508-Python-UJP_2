@@ -1,6 +1,5 @@
 from django.db.models import Q
 from django.shortcuts import render
-import logging
 
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
@@ -14,7 +13,6 @@ from users.permissions import IsStartupRole, IsInvestorRole, _get_role_from_requ
 from .models import ChatRoom, Message
 from .serializers import ChatRoomSerializer, MessageSerializer
 
-logger = logging.getLogger(__name__)
 
 
 class ConversationViewSet(viewsets.ViewSet):
@@ -157,8 +155,6 @@ class MessageViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
 
 def index(request):
     """Render the chat index page."""
-    for header, value in request.META.items():
-        logger.error(f"{header}: {value}")
     return render(request, "chat/index.html")
 
 
