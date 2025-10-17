@@ -1,0 +1,21 @@
+[submodule "services/Investment"]
+	path = services/Investment
+	url = https://github.com/ITA-Dnipro/202508-Python-Investment-Service.git
+[submodule "services/Forum"]
+	path = services/Forum
+	url = https://github.com/ITA-Dnipro/202508-Python-Forum-system.git
+[submodule "services/Gamification"]
+	path = services/Gamification
+	url = https://github.com/ITA-Dnipro/202508-Python-Gamification-service.git
+[submodule "services/Smartmatching"]
+	path = services/Smartmatching
+	url = https://github.com/ITA-Dnipro/202508-Python-Smart-matching.git
+[submodule "services/Events"]
+	path = services/Events
+	url = https://github.com/ITA-Dnipro/202508-Python-Events.git
+[submodule "services/SaveList"]
+	path = services/SaveList
+	url = https://github.com/ITA-Dnipro/202508-Python-SaveList-Analytics.git
+[submodule "services/Comment"]
+	path = services/Comment
+	url = https://github.com/ITA-Dnipro/202508-Python-Comment-project.git
