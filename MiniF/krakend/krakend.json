@@ -86,6 +86,15 @@
       "output_encoding": "json",
       "input_query_strings": ["*"],
       "input_headers": ["*"],
+      "extra_config": {
+        "proxy/sequential": true,
+        "proxy": {
+          "flatmap_filter": [
+            { "type": "del", "args": ["role"] },
+            { "type": "del", "args": ["user_id"] }
+          ]
+        }
+      },
       "backend": [
         {
           "url_pattern": "/api/users/auth/confirm-token/",
@@ -113,17 +122,18 @@
                 "user_id": "@response0.user_id",
                 "role": "@response0.role"
               }
+            },
+            "proxy": {
+              "flatmap_filter": [
+                {
+                  "type": "move",
+                  "args": ["results", "results"]
+                }
+              ]
             }
           }
         }
-      ],
-      "extra_config": {
-        "proxy/sequential": true,
-        "proxy/error_handler": {
-          "status_code": 401,
-          "message": "Unauthorized"
-        }
-      }
+      ]
     },
     {
       "endpoint": "/api/profiles/search/",
@@ -143,6 +153,9 @@
                 "source_field": "user_id",
                 "target_header": "user_id"
               }
+            },
+            "proxy": {
+              "flatmap_filter": []
             }
           }
         },
@@ -153,10 +166,13 @@
           "encoding": "json",
           "allow": ["*"],
           "extra_config": {
-            "modifier/headers": {
-              "add": {
-                "user_id": "@response0.user_id",
-                "role": "@response0.role"
+            "plugin/http": {
+              "name": "internal-call",
+              "options": {
+                "set_headers": {
+                  "user_id": "@response0.user_id",
+                  "role": "@response0.role"
+                }
               }
             }
           }
