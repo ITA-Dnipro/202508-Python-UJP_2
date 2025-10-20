@@ -20,4 +20,7 @@ urlpatterns = [
     path("api/profiles/", include("profiles.urls")),
     path("api/projects/", include("projects.urls")),
     path("chat/", include("communications.urls")),
+    path("profiles/startups/", startup_list),
+    path("profiles/startups/<int:startup_id>/", startup_detail),
+    path("notifications/", include("notifications.urls"))
 ]

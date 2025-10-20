@@ -1,8 +1,10 @@
 import logging
 from django.db import IntegrityError
+from django.db.models import F
 from django.forms import ValidationError
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
-from rest_framework import viewsets, filters, generics, status
+from rest_framework import filters, generics, status, viewsets
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -13,6 +15,7 @@ from django_elasticsearch_dsl_drf.filter_backends import (
     SearchFilterBackend,
 )
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
+from users.permissions import IsInvestorRole
 from projects.models import StartupProject
 from .models import StartupProfile, InvestorProfile, Industry, SavedProject
 from .documents import StartupDocument
@@ -27,6 +30,7 @@ from .serializers import (
     SavedProjectSerializer,
     StartupDocumentSerializer,
 )
+
 
 logger = logging.getLogger(__name__)
 
@@ -148,27 +152,16 @@ class SaveProjectView(APIView):
     """
     Endpoint for saving a project for an investor.
     """
-
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        investor_id = request.data.get("investor_id")
-        if not investor_id:
-            return Response({"detail": "investor_id is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        investor = get_object_or_404(InvestorProfile, id=investor_id)
-
-        if investor.user_id != request.user:
-            return Response({"detail": "You cannot save projects for another investor."}, status=status.HTTP_403_FORBIDDEN)
-
-        project_id = request.data.get("project_id")
-        if not project_id:
-            return Response({"detail": "project_id is required"}, status=status.HTTP_400_BAD_REQUEST)
-
+    permission_classes = [IsAuthenticated, IsInvestorRole]
+    def post(self, request, project_id):
+        investor = get_object_or_404(InvestorProfile, user_id=self.request.user.id)
         project = get_object_or_404(StartupProject, id=project_id)
 
         try:
             saved = SavedProject.objects.create(investor=investor, project=project)
+            project.likes = F("likes") + 1
+            project.save(update_fields=["likes"])
+            project.refresh_from_db()
         except IntegrityError:
             return Response({"detail": "Project already saved"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -184,19 +177,11 @@ class SavedProjectListView(generics.ListAPIView):
     """
     List all projects saved by the authenticated investor.
     """
-
+    permission_classes = [IsAuthenticated, IsInvestorRole]
     serializer_class = SavedProjectSerializer
 
     def get_queryset(self):
-        investor_id = self.request.query_params.get("investor_id")
-
-        if investor_id:
-            investor = get_object_or_404(InvestorProfile, id=investor_id)
-            if investor.user_id != self.request.user:
-                return SavedProject.objects.none()
-        else:
-            investor = get_object_or_404(InvestorProfile, user_id=self.request.user)
-
+        investor = get_object_or_404(InvestorProfile, user_id=self.request.user.id)
         return SavedProject.objects.filter(investor=investor).order_by("-id")
 
 
@@ -204,29 +189,24 @@ class UnsaveProjectView(APIView):
     """
     API endpoint to remove a saved project for an investor.
     """
+    permission_classes = [IsAuthenticated, IsInvestorRole]
+    def delete(self, request, saved_project_id):
+        investor = get_object_or_404(InvestorProfile, user_id=self.request.user.id)
 
-    permission_classes = [IsAuthenticated]
+        saved = get_object_or_404(
+            SavedProject,
+            id=saved_project_id,
+            investor=investor
+        )
 
-    def delete(self, request):
-        investor_id = request.query_params.get("investor_id")
-        if not investor_id:
-            return Response({"detail": "investor_id is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-        saved_project_id = request.query_params.get("saved_project_id")
-        if not saved_project_id:
-            return Response({"detail": "saved_project_id is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        investor = get_object_or_404(InvestorProfile, id=investor_id)
-
-        if investor.user_id != request.user:
-            return Response({"detail": "You cannot modify saved projects for another investor."}, status=status.HTTP_403_FORBIDDEN)
-
-        saved = SavedProject.objects.filter(id=saved_project_id, investor=investor).first()
         if not saved:
             return Response({"detail": "Project not saved"}, status=status.HTTP_404_NOT_FOUND)
+
+        saved.project.likes = F("likes") - 1
+        saved.project.save(update_fields=["likes"])
+        saved.project.refresh_from_db()
         saved.delete()
+
         return Response({"detail": "Project unsaved"}, status=status.HTTP_204_NO_CONTENT)
 
 class StartupSearchViewSet(DocumentViewSet):
