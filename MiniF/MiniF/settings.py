@@ -90,25 +90,37 @@ else:
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("redis", 6379)],
+try:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("redis", 6379)],
+            },
         },
-    },
-}
-mongoengine.connect(host=env("MONGO_URI"))
+    }
+except Exception:
+    CHANNEL_LAYERS = {
+        "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
+    }
 
-ELASTICSEARCH_DSL = {
+try:
+    mongoengine.connect(host=env("MONGO_URI"))
+except Exception:
+    None
 
-    'default': {
+try:
+    ELASTICSEARCH_DSL = {
 
-        'hosts': 'http://elasticsearch:9200'
+        'default': {
 
-    },
+            'hosts': 'http://elasticsearch:9200'
 
-}
+        },
+
+    }
+except Exception:
+    None
 
 LANGUAGE_CODE = env("LANGUAGE_CODE")
 TIME_ZONE = env("TIME_ZONE")
