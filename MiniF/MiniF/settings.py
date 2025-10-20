@@ -81,9 +81,9 @@ TEMPLATES = [
 WSGI_APPLICATION = "MiniF.wsgi.application"
 ASGI_APPLICATION = "MiniF.asgi.application"
 
-if env("DATABASE_URL", default=""):
+try:
     DATABASES = {"default": env.db("DATABASE_URL")}
-else:
+except Exception:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",

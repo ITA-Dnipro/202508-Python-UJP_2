@@ -23,8 +23,8 @@ def get_user_and_role_from_headers(request):
 
     try:
         user = UserProfile.objects.get(id=user_id)
-    except UserProfile.DoesNotExist:
-        raise PermissionDenied("User not found")
+    except UserProfile.DoesNotExist as exc:
+        raise PermissionDenied("User not found") from exc
 
     return user, role
 
@@ -80,11 +80,12 @@ class ConversationViewSet(viewsets.ViewSet):
     @action(detail=True, methods=["get"])
     def messages(self, request, pk=None):
         try:
-            messages = Message.objects.filter(room_id=pk).order_by("timestamp")
+            room = ChatRoom.objects.get(id=pk)  # Added to actually raise DoesNotExist if room invalid
+            messages = Message.objects.filter(room=room).order_by("timestamp")  # pylint: disable=no-member
             serializer = MessageSerializer(messages, many=True)
             return Response(serializer.data)
-        except ChatRoom.DoesNotExist:
-            raise NotFound("Conversation not found")
+        except ChatRoom.DoesNotExist as exc:
+            raise NotFound("Conversation not found") from exc
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -93,7 +94,7 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user, _ = get_user_and_role_from_headers(self.request)
-        return Message.objects.filter(
+        return Message.objects.filter(  # pylint: disable=no-member
             room__in=ChatRoom.objects.filter(Q(investor=user) | Q(startup=user))
         ).order_by("-created_at")
 
@@ -106,8 +107,8 @@ class MessageViewSet(viewsets.ModelViewSet):
 
         try:
             room = ChatRoom.objects.get(id=room_id)
-        except ChatRoom.DoesNotExist:
-            raise ValidationError({"room": "Chat room not found"})
+        except ChatRoom.DoesNotExist as exc:
+            raise ValidationError({"room": "Chat room not found"}) from exc
 
         if user not in [room.investor, room.startup]:
             raise PermissionDenied("You are not a participant in this room.")
