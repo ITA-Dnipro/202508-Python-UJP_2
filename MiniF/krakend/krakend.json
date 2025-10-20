@@ -142,15 +142,7 @@
           "host": ["http://web:8000"],
           "method": "GET",
           "encoding": "json",
-          "allow": ["*"],
-          "extra_config": {
-            "plugin/req-resp-modifier": {
-              "name": ["internal-call"],
-              "internal-call": {
-                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
-              }
-            }
-          }
+          "allow": ["*"]
         }
       ],
       "extra_config": {
