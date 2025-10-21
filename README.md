@@ -118,16 +118,69 @@ This command will fail if there are unapplied model changes.
 
 If migration files are outdated, duplicated, or broken:
 1. Delete all migration files (`*.py`) in each app’s `migrations/` folder, except `__init__.py`.
+For Linux: 
+
+    ```bash
+    find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+    ```
+For Windows:
+
+     ```bash
+    Get-ChildItem -Path . -Recurse -Include *.py | Where-Object { $_.DirectoryName -match 'migrations' -and $_.Name -ne '__init__.py'} | Remove-Item
+    ```
+
 2. Generate new initial migrations:
 
     ```bash
     python manage.py makemigrations
     ```
+    or 
+    ```bash
+    docker compose exec web python manage.py makemigrations
+    ```
+
+3. Delete the tables from db:
+To connect to the postgresql(you have to compose up the docker before it):
+
+    ```bash
+    psql -U postgres
+    ```
+    or 
+    ```bash
+    docker exec -it minif-db-1  psql -U postgres
+    ```
+
+To stop minif-web-1:
+
+    ```bash
+    docker stop minif-web-1
+    ```
+
+Then we have to delete the db (make sure that minif-web-1 is stopped and pgadmin is closed):
+
+    ```bash
+    DROP DATABASE "miniF-db";
+    \q
+    ```
+
+Then rebuild and start (compose up) the docker. 
+
+To create db:
+
+    ```bash
+    docker exec -it minif-db-1  psql -U postgres
+    CREATE DATABASE "miniF-db";
+    \q
+    ```
 
 3. Apply migrations with:
 
     ```bash
-    python manage.py migrate --fake-initial
+    python manage.py migrate 
+    ```
+    or 
+    ```bash
+    docker compose exec web python manage.py migrate 
     ```
 
 ### Automated Checks
