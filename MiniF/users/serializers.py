@@ -58,12 +58,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             last_name=data.get("last_name", ""),
             user_phone=data.get("user_phone"),
         )
-    
-        try:
-                logger.info(f"Triggering welcome email for new user: {user.email}")
-                send_welcome_email.delay(user.id)
-        except Exception as e:
-                logger.error(f"Failed to trigger welcome email for {user.email}: {e}")
         
         return user
 
@@ -137,11 +131,7 @@ class CustomLoginSerializer(serializers.Serializer):
         if not user:
             raise serializers.ValidationError("Invalid credentials")
 
-        try:
-            logger.info(f"Triggering welcome email for logged in user: {user.email}")
-            send_welcome_email.delay(user.id)
-        except Exception as e:
-            logger.error(f"Failed to trigger welcome email for {user.email}: {e}")
+       
         
         if role == "startup" and not StartupProfile.objects.filter(user_id=user.id).exists():
             raise serializers.ValidationError("User is not a startup.")
