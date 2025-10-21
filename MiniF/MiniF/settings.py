@@ -3,6 +3,7 @@ import environ
 from datetime import timedelta
 import mongoengine
 import os
+import sys
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -150,6 +151,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "users.validators.UppercaseValidator"},
 ]
 
+if 'test' in sys.argv:
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]

@@ -12,5 +12,5 @@ def send_welcome_email_on_creation(sender, instance, created, **kwargs):
     Sends a welcome email when a new UserProfile is created.
     """
     if created:
-        logger.info(f"Triggering welcome email for new user: {instance.email}")
+        logger.info(f"Triggering welcome email for new user: {instance.email} from model {sender.__name__}")
         send_welcome_email.delay(instance.id)
