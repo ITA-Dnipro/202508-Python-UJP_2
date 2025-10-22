@@ -107,7 +107,7 @@ except Exception:
 try:
     mongoengine.connect(host=env("MONGO_URI"))
 except Exception:
-    None
+    None # continue execution if mongodb is not raised
 
 try:
     ELASTICSEARCH_DSL = {
@@ -120,7 +120,7 @@ try:
 
     }
 except Exception:
-    None
+    None # continue execution if elasticsearch is not raised
 
 LANGUAGE_CODE = env("LANGUAGE_CODE")
 TIME_ZONE = env("TIME_ZONE")
