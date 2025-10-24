@@ -80,11 +80,15 @@ class ConfirmTokenView(APIView):
     """
     GET /api/auth/confirm-token/
     body: { "token": "..." }
-
     """
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        return Response({"user_id": request.user.id, "role": request.auth.payload.get("role") if request.auth.payload.get("role") else None}, status=status.HTTP_200_OK)
-
+        return Response(
+            {
+                "user_id": request.user.id,
+                "role": request.auth.payload.get("role") if request.auth.payload.get("role") else None
+            },
+            status=status.HTTP_200_OK
+        )
