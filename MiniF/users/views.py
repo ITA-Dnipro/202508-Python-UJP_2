@@ -78,13 +78,13 @@ class PasswordResetConfirmAPIView(APIView):
 
 class ConfirmTokenView(APIView):
     """
-    POST /api/auth/confirm-token/
+    GET /api/auth/confirm-token/
     body: { "token": "..." }
-    """
-    def get(self, request, *args, **kwargs):
-        if not request.user or not request.user.is_authenticated:
-            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
 
-        # I need to return user id end role(if exist)
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
         return Response({"user_id": request.user.id, "role": request.auth.payload.get("role") if request.auth.payload.get("role") else None}, status=status.HTTP_200_OK)
 

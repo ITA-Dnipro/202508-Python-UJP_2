@@ -15,18 +15,15 @@ from .serializers import ChatRoomSerializer, MessageSerializer
 
 def get_user_and_role_from_headers(request):
     """Helper: extract user and role from Krakend headers"""
-    user_id = request.META.get("HTTP_USER_ID")
-    role = request.META.get("HTTP_ROLE")
-
-    if not user_id or not role:
-        raise PermissionDenied("Missing authentication headers from Krakend")
-
     try:
+        user_id = request.META["HTTP_USER_ID"]
+        role = request.META["HTTP_ROLE"]
         user = UserProfile.objects.get(id=user_id)
-    except UserProfile.DoesNotExist as exc:
-        raise PermissionDenied("User not found") from exc
-
-    return user, role
+        return user, role
+    except KeyError:
+        raise PermissionDenied("Missing authentication headers from Krakend")
+    except UserProfile.DoesNotExist:
+        raise PermissionDenied("User not found")
 
 
 class ConversationViewSet(viewsets.ViewSet):

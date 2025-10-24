@@ -38,7 +38,12 @@
           "url_pattern": "/api/users/auth/confirm-token/",
           "host": ["http://web:8000"],
           "method": "GET",
-          "encoding": "json"
+          "encoding": "json",
+          "extra_config": {
+            "proxy": {
+              "cache_ttl": "0s"
+            }
+          }
         }
       ]
     },
