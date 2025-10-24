@@ -20,10 +20,10 @@ def get_user_and_role_from_headers(request):
         role = request.META["HTTP_ROLE"]
         user = UserProfile.objects.get(id=user_id)
         return user, role
-    except KeyError:
-        raise PermissionDenied("Missing authentication headers from Krakend")
-    except UserProfile.DoesNotExist:
-        raise PermissionDenied("User not found")
+    except KeyError as exc:
+        raise PermissionDenied("Missing authentication headers from Krakend") from exc
+    except UserProfile.DoesNotExist as exc:
+        raise PermissionDenied("User not found") from exc
 
 
 class ConversationViewSet(viewsets.ViewSet):
