@@ -9,6 +9,9 @@ from .views import (
     UnsaveProjectView,
     StartupSearchViewSet,
 )
+
+app_name = "profiles" 
+
 router = DefaultRouter()
 router.register(r"startup-profiles", StartupProfileViewSet, basename="startupprofile")
 router.register(r"investor-profiles", InvestorProfileViewSet, basename="investorprofile")
