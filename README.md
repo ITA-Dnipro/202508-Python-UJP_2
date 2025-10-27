@@ -46,7 +46,8 @@ MQ: event publishing for notifications, analytics, search index.
 
 **1st: Sequence diagram**
 
-<img width="1456" height="530" alt="image" src="https://github.com/user-attachments/assets/bd08323a-1461-4650-9683-648315e8173a" />
+<img width="1517" height="605" alt="image" src="https://github.com/user-attachments/assets/8096f431-5958-41b7-af40-d090b0692eb0" />
+
 
 **2nd: Component diagram**
 
