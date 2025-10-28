@@ -135,7 +135,7 @@ class StartupProfileViewSetFilteringTests(APITestCase):
             location="Lviv",
         )
 
-        self.list_url = reverse("startupprofile-list")
+        self.list_url = "/profiles/startup/"
 
     def test_filter_by_industry_case_insensitive(self):
         """?industry=tech should return only Tech industry profiles."""
