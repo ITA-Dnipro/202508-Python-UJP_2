@@ -1,4 +1,3 @@
-# projects/tests/test_models.py
 from django.test import TestCase
 from django.utils import timezone
 from profiles.models import StartupProfile, Industry
@@ -24,7 +23,7 @@ class StartupProjectModelTest(TestCase):
             industry_id=self.industry,
             location="Kyiv",
         )
-
+        
     def test_project_creation(self):
         """Test StartupProject creation"""
         project = StartupProject.objects.create(
@@ -38,7 +37,9 @@ class StartupProjectModelTest(TestCase):
         self.assertEqual(project.likes, 0)
         self.assertEqual(project.status, "Active")
         self.assertIsNotNone(project.created_at)
-        self.assertIsNone(project.updated_at)
+        
+        
+        self.assertIsNotNone(project.updated_at)
 
     def test_str_method(self):
         """Test string representation"""

@@ -38,3 +38,5 @@ class StartupDocumentSerializer(DocumentSerializer):
             "startup_name",
         )
 
+        ref_name = "projects"
+

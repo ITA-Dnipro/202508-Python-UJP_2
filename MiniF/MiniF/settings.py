@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "dj_rest_auth",
     "dj_rest_auth.registration",
     'rest_framework_simplejwt.token_blacklist',
@@ -104,7 +105,7 @@ ELASTICSEARCH_DSL = {
 
     'default': {
 
-        'hosts': 'http://elasticsearch:9200'
+        'hosts': os.getenv('ELASTICSEARCH_URL', 'http://elasticsearch:9200')
 
     },
 
@@ -166,6 +167,18 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": ["email", "profile"],
+        "AUTH_PARAMS": {"access_type": "offline"},
+    }
+}
+
+SOCIALACCOUNT_ADAPTER = "users.adapters.CustomSocialAccountAdapter"
+LOGIN_REDIRECT_URL = "/accounts/email/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"
+ACCOUNT_LOGOUT_REDIRECT_URL = LOGOUT_REDIRECT_URL
 
 
 LOGGING = {
