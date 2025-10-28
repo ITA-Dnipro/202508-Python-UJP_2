@@ -43,7 +43,8 @@ We are committed to delivering a platform that is not just a marketplace for ide
 
 **Security:** JWT-authenticated endpoints; actions verified by user ID and role.
 
-<img width="1075" height="1023" alt="micros drawio" src="https://github.com/user-attachments/assets/7b555187-359d-4979-bb8a-58e32f750899" />
+<img width="1440" height="1081" alt="micros-Сторінка-2 drawio" src="https://github.com/user-attachments/assets/168624ad-2ae8-4b3f-9fba-b1ced84e1bbc" />
+
 
 ### Basic Epics
 
