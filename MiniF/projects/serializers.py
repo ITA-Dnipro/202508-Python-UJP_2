@@ -38,5 +38,5 @@ class StartupDocumentSerializer(DocumentSerializer):
             "startup_name",
         )
 
-        ref_name = "profiles"
+        ref_name = "projects"
 
