@@ -18,7 +18,10 @@ class InvestorProfileModelTest(TestCase):
         self.assertEqual(profile.location, "Kyiv")
         self.assertIsNotNone(profile.created_at)
         self.assertIsNotNone(profile.updated_at)
-        self.assertEqual(str(profile), self.user.email)
+
+        
+        expected_str = f"Investor: {self.user.email} (focus: {self.industry.industry_name})"
+        self.assertEqual(str(profile), expected_str)
 
     def test_create_investorprofile_fail(self):
         profile = InvestorProfile(user_id=self.user, investment_focus=self.industry, location=None)

@@ -1,8 +1,8 @@
 import logging
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
@@ -17,6 +17,8 @@ from .serializers import (
 )
 from .documents import StartupDocument
 from .serializers import StartupDocumentSerializer
+from notifications.models import Notification, NotificationType
+from profiles.models import InvestorProfile, SavedProject
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +62,6 @@ class StartupProjectView(DocumentViewSet):
     }
     ordering = ('startup_name.raw',)
 
-
 class StartupProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint for managing startup projects.
@@ -74,15 +75,6 @@ class StartupProjectViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["title", "description", "status"]
     ordering_fields = ["created_at", "likes"]
-    
-    def get_serializer_class(self):
-        """
-        Use an update-friendly serializer for PUT/PATCH,
-        otherwise the read serializer.
-        """
-        if self.action in ("create", "update", "partial_update"):
-            return StartupProjectCreateUpdateSerializer
-        return StartupProjectSerializer
 
 
     def get_queryset(self):
@@ -95,3 +87,34 @@ class StartupProjectViewSet(viewsets.ModelViewSet):
         if startup_id:
             qs = qs.filter(startup_profile_id=startup_id)
         return qs
+
+    def update(self, request, *args, **kwargs):
+        """
+        Updating a table in the database when a change occurs in the project
+        """
+        response = super().update(request, *args, **kwargs)
+
+        project = self.get_object()
+
+        investor_ids = SavedProject.objects.filter(project=project).values_list("investor_id", flat=True)
+        if not investor_ids:
+            return response
+
+        investors = InvestorProfile.objects.filter(id__in=investor_ids)
+
+        notif_type, _ = NotificationType.objects.get_or_create(name="project_updated")
+
+        msg = f"Проєкт «{project.title}» було оновлено."
+
+        notifications = [
+            Notification(
+                investor=inv,
+                startup=project.startup_profile_id,
+                notification_type=notif_type,
+                message=msg,
+            )
+            for inv in investors
+        ]
+        Notification.objects.bulk_create(notifications)
+
+        return response

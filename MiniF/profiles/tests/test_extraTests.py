@@ -100,22 +100,34 @@ class StartupProfileViewSetFilteringTests(APITestCase):
     """
 
     def setUp(self):
-        self.user = User.objects.create_user(email="u3@example.com", username="u3", password="x")
-        self.client.force_authenticate(user=self.user)
+    
+        self.user_tech = User.objects.create_user(
+            email="tech@example.com", username="tech_user", password="x"
+        )
+        
+        self.user_bio = User.objects.create_user(
+            email="bio@example.com", username="bio_user", password="x"
+        )
 
+        
+        self.client.force_authenticate(user=self.user_tech)
+
+        
         self.ind_tech = Industry.objects.create(industry_name="Tech")
         self.ind_bio = Industry.objects.create(industry_name="Biotech")
 
+        
         StartupProfile.objects.create(
-            user_id=self.user,
+            user_id=self.user_tech,  
             company_name="TechKyiv",
             description="",
             website=None,
             industry_id=self.ind_tech,
             location="Kyiv",
         )
+        
         StartupProfile.objects.create(
-            user_id=self.user,
+            user_id=self.user_bio,  
             company_name="BioLviv",
             description="",
             website=None,
@@ -123,7 +135,7 @@ class StartupProfileViewSetFilteringTests(APITestCase):
             location="Lviv",
         )
 
-        self.list_url = reverse("startupprofile-list")
+        self.list_url = reverse("profiles:startupprofile-list")
 
     def test_filter_by_industry_case_insensitive(self):
         """?industry=tech should return only Tech industry profiles."""

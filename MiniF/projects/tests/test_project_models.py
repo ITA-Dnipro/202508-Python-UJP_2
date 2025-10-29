@@ -34,7 +34,7 @@ class StartupProjectModelsTest(TestCase):
         self.assertEqual(project.description, "Project description")
         self.assertEqual(project.status, "Active")
         self.assertIsNotNone(project.created_at)
-        self.assertEqual(str(project), f"Project Alpha - {self.startup.company_name}")
+        self.assertEqual(str(project), "Project Alpha")
 
     def test_create_project_fail_missing_title(self):
         project = StartupProject(

@@ -26,6 +26,11 @@ services:
           coverage run manage.py test &&
           coverage report -m
         "
+      depends_on: 
+        elasticsearch:
+          condition: service_healthy
+        db: 
+          condition: service_healthy
 
   lint:
     build: .
@@ -51,8 +56,13 @@ services:
       - POSTGRES_DB=miniF_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=585662vcxz
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U postgres -d miniF_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
-      - "5432:5432"
+      - "5433:5432"
   redis:
     image: redis:latest
     ports:
@@ -78,8 +88,42 @@ services:
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
     ports:
       - "9200:9200"
+    healthcheck: 
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
     volumes:
       - es_data:/usr/share/elasticsearch/data
+
+  celery:
+    build: .
+    command: celery -A MiniF worker -l info
+    volumes:
+      - .:/app
+    working_dir: /app
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - web
+
+  krakend:
+    build: ./krakend
+    container_name: krakend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - web
+      - db
+      - redis
+      - mongodb
+      - elasticsearch
+    environment:
+      - KRAKEND_PORT=8080
+      - KRAKEND_PLUGINS_ENABLED=true
+      - KRAKEND_PLUGINS_DIR=/etc/krakend/plugins
+    restart: unless-stopped
 
 volumes:
   postgres_data:
