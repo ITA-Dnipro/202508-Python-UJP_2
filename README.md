@@ -111,4 +111,114 @@ MQ: event publishing for notifications, analytics, search index.
 - Regular feedback from both user groups (startups and investors) should be incorporated.
 
 
+## Database Migration Process
 
+### Creating Migrations 
+
+After making changes to Django models, create new migration files:
+
+```bash
+python manage.py makemigrations
+```
+
+### Applying Migrations
+
+Apply migrations to update the database schema:
+
+```bash
+python manage.py migrate
+```
+
+### Verifying Migration Consistency
+
+Before pushing changes, check that all model changes are reflected in migrations:
+
+```bash
+python manage.py makemigrations --check
+```
+
+This command will fail if there are unapplied model changes.
+
+### Resolving Migration Conflicts or Inconsistencies
+
+If migration files are outdated, duplicated, or broken:
+1. Delete all migration files (`*.py`) in each app’s `migrations/` folder, except `__init__.py`.
+For Linux: 
+
+    ```bash
+    find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+    ```
+For Windows:
+
+     ```bash
+    Get-ChildItem -Path . -Recurse -Include *.py | Where-Object { $_.DirectoryName -match 'migrations' -and $_.Name -ne '__init__.py'} | Remove-Item
+    ```
+
+2. Generate new initial migrations:
+
+    ```bash
+    python manage.py makemigrations
+    ```
+    or 
+    ```bash
+    docker compose exec web python manage.py makemigrations
+    ```
+
+3. Delete the tables from db:
+To connect to the postgresql(you have to compose up the docker before it):
+
+    ```bash
+    psql -U postgres
+    ```
+    or 
+    ```bash
+    docker exec -it minif-db-1  psql -U postgres
+    ```
+
+To stop minif-web-1:
+
+    ```bash
+    docker stop minif-web-1
+    ```
+
+Then we have to delete the db (make sure that minif-web-1 is stopped and pgadmin is closed):
+
+    ```bash
+    DROP DATABASE "miniF-db";
+    \q
+    ```
+
+Then rebuild and start (compose up) the docker. 
+
+To create db:
+
+    ```bash
+    docker exec -it minif-db-1  psql -U postgres
+    CREATE DATABASE "miniF-db";
+    \q
+    ```
+
+3. Apply migrations with:
+
+    ```bash
+    python manage.py migrate 
+    ```
+    or 
+    ```bash
+    docker compose exec web python manage.py migrate 
+    ```
+
+### Automated Checks
+
+CI runs the following checks to ensure migration consistency:
+
+```bash
+python manage.py makemigrations --check
+python manage.py migrate --noinput
+```
+
+### Best Practices
+
+- Do not manually edit migration files.
+- Always commit migration files with model changes.
+- Coordinate major migration resets with the team.
