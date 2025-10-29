@@ -95,6 +95,19 @@ services:
       retries: 5
     volumes:
       - es_data:/usr/share/elasticsearch/data
+
+  celery:
+    build: .
+    command: celery -A MiniF worker -l info
+    volumes:
+      - .:/app
+    working_dir: /app
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - web
+
   krakend:
     build: ./krakend
     container_name: krakend
