@@ -113,13 +113,9 @@ except Exception:
 
 try:
     ELASTICSEARCH_DSL = {
-
         'default': {
-
-            'hosts': 'http://elasticsearch:9200'
-
+            'hosts': env("ELASTICSEARCH_URL", default="http://elasticsearch:9200")
         },
-
     }
 except Exception:
     None # continue execution if elasticsearch is not raised
