@@ -29,6 +29,31 @@ We are committed to delivering a platform that is not just a marketplace for ide
 ### Database schema
 <img width="884" height="783" alt="Screenshot_db" src="https://github.com/user-attachments/assets/50575ba4-a772-4625-8ad3-a7343e90cea2" />
 
+
+### Comment Micro-Service:
+
+API Gateway: routes, can do rate-limit, auth pass-through.
+
+Comments Service: REST API (FastAPI / Flask).
+
+Auth Service: token validation; can integrate with central auth (JWT).
+
+Projects Service: project_id validation.
+
+DB: PostgreSQL for comments.
+
+MQ: event publishing for notifications, analytics, search index.
+
+**1st: Sequence diagram**
+
+<img width="1517" height="605" alt="image" src="https://github.com/user-attachments/assets/8096f431-5958-41b7-af40-d090b0692eb0" />
+
+
+**2nd: Component diagram**
+
+<img width="2138" height="341" alt="image" src="https://github.com/user-attachments/assets/547ab9e1-f5f7-4bdc-88df-a79661958785" />
+
+
 ### Basic Epics
 
 0. **As a user of the platform**, I want the ability to represent both as a startup and as an investor company, so that I can engage in the platform's ecosystem from both perspectives using a single account.
