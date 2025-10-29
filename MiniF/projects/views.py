@@ -1,8 +1,8 @@
 import logging
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
@@ -62,7 +62,6 @@ class StartupProjectView(DocumentViewSet):
     }
     ordering = ('startup_name.raw',)
 
-
 class StartupProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint for managing startup projects.
@@ -76,15 +75,6 @@ class StartupProjectViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["title", "description", "status"]
     ordering_fields = ["created_at", "likes"]
-    
-    def get_serializer_class(self):
-        """
-        Use an update-friendly serializer for PUT/PATCH,
-        otherwise the read serializer.
-        """
-        if self.action in ("create", "update", "partial_update"):
-            return StartupProjectCreateUpdateSerializer
-        return StartupProjectSerializer
 
 
     def get_queryset(self):

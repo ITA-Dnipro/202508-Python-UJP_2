@@ -1,0 +1,196 @@
+{
+  "$schema": "https://www.krakend.io/schema/krakend.json",
+  "version": 3,
+  "extra_config": {
+    "router": {
+      "auto_options": true,
+      "return_error_details": "proxy"
+    },
+    "telemetry/logging": {
+      "level": "DEBUG",
+      "prefix": "[KRAKEND]",
+      "syslog": false,
+      "stdout": true,
+      "format": "default"
+    },
+    "security/cors": {
+      "allow_origins": ["*"],
+      "allow_methods": ["GET", "POST", "PUT", "DELETE"],
+      "expose_headers": ["Content-Length", "Content-Type", "Authorization"],
+      "allow_headers": ["Accept-Language", "Authorization", "Content-Type"],
+      "max_age": "12h",
+      "allow_credentials": true,
+      "debug": false
+    }
+  },
+  "plugin": {
+    "pattern": ".so",
+    "folder": "/etc/krakend/plugins"
+  },
+  "endpoints": [
+    {
+      "endpoint": "/api/users/auth/confirm-token/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/users/auth/confirm-token/",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "encoding": "json",
+          "extra_config": {
+            "proxy": {
+              "cache_ttl": "0s"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/users/auth/login/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "host": ["http://web:8000"],
+          "url_pattern": "/api/users/auth/login/",
+          "method": "POST",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/users/auth/registration/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/users/auth/registration/",
+          "host": ["http://web:8000"],
+          "method": "POST",
+          "encoding": "json",
+          "extra_config": {
+            "proxy": {
+              "flatmap_filter": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/projects/startup-project-search",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/projects/startup-project-search",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "encoding": "json",
+          "allow": ["*"],
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/profiles/search/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/profiles/search/",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "encoding": "json",
+          "allow": ["*"],
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "proxy/sequential": true,
+        "proxy/error_handler": {
+          "status_code": 401,
+          "message": "Unauthorized"
+        }
+      }
+    },
+    {
+      "endpoint": "/chat/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/chat/",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "encoding": "json",
+          "allow": ["*"]
+        }
+      ],
+      "extra_config": {
+        "proxy/sequential": true,
+        "proxy/error_handler": {
+          "status_code": 401,
+          "message": "Unauthorized"
+        }
+      }
+    },
+    {
+      "endpoint": "/chat/api/conversations/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/chat/api/conversations/",
+          "host": ["http://web:8000"],
+          "method": "POST",
+          "encoding": "json",
+          "allow": ["*"],
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "proxy/sequential": true,
+        "proxy/error_handler": {
+          "status_code": 401,
+          "message": "Unauthorized"
+        }
+      }
+    }
+  ],
+  "timeout": "3s",
+  "cache_ttl": "300s",
+  "port": 8080
+}

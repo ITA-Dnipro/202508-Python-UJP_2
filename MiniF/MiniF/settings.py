@@ -83,34 +83,42 @@ TEMPLATES = [
 WSGI_APPLICATION = "MiniF.wsgi.application"
 ASGI_APPLICATION = "MiniF.asgi.application"
 
-if env("DATABASE_URL", default=""):
+try:
     DATABASES = {"default": env.db("DATABASE_URL")}
-else:
+except Exception:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("redis", 6379)],
+try:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("redis", 6379)],
+            },
         },
-    },
-}
-mongoengine.connect(host=env("MONGO_URI"))
+    }
+except Exception:
+    CHANNEL_LAYERS = {
+        "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
+    }
 
-ELASTICSEARCH_DSL = {
+try:
+    mongoengine.connect(host=env("MONGO_URI"))
+except Exception:
+    None # continue execution if mongodb is not raised
 
-    'default': {
-
-        'hosts': os.getenv('ELASTICSEARCH_URL', 'http://elasticsearch:9200')
-
-    },
-
-}
+try:
+    ELASTICSEARCH_DSL = {
+        'default': {
+            'hosts': env("ELASTICSEARCH_URL", default="http://elasticsearch:9200")
+        },
+    }
+except Exception:
+    None # continue execution if elasticsearch is not raised
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
