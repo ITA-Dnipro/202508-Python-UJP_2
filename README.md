@@ -54,6 +54,22 @@ MQ: event publishing for notifications, analytics, search index.
 <img width="2138" height="341" alt="image" src="https://github.com/user-attachments/assets/547ab9e1-f5f7-4bdc-88df-a79661958785" />
 
 
+### Gamification Micro-Service
+
+**Storage:** PostgreSQL (tables for EXP, badges, levels, leaderboards).
+
+**Caching:** Redis for leaderboard performance.
+
+**Event Processing:** Consume platform events (e.g., “project.created”, “investment.made”, “comment.added”) via message queue (RabbitMQ/Kafka).
+
+**API Layer:** REST endpoints for retrieving user stats, badges, levels, and leaderboards.
+
+**Admin Config:** Internal API for adjusting XP values, thresholds, and badge rules.
+
+**Security:** JWT-authenticated endpoints; actions verified by user ID and role.
+
+<img width="1440" height="1081" alt="micros-Сторінка-2 drawio" src="https://github.com/user-attachments/assets/168624ad-2ae8-4b3f-9fba-b1ced84e1bbc" />
+
 ### Basic Epics
 
 0. **As a user of the platform**, I want the ability to represent both as a startup and as an investor company, so that I can engage in the platform's ecosystem from both perspectives using a single account.
