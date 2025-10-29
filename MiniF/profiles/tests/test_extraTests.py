@@ -93,3 +93,62 @@ class OneProfilePerUserSerializerRuleTests(TestCase):
             ser.save()
 
 
+class StartupProfileViewSetFilteringTests(APITestCase):
+    """
+    tests that the list endpoint respects ?industry=... and ?location=...
+    Uses force_authenticate to bypass auth complexity.
+    """
+
+    def setUp(self):
+    
+        self.user_tech = User.objects.create_user(
+            email="tech@example.com", username="tech_user", password="x"
+        )
+        
+        self.user_bio = User.objects.create_user(
+            email="bio@example.com", username="bio_user", password="x"
+        )
+
+        
+        self.client.force_authenticate(user=self.user_tech)
+
+        
+        self.ind_tech = Industry.objects.create(industry_name="Tech")
+        self.ind_bio = Industry.objects.create(industry_name="Biotech")
+
+        
+        StartupProfile.objects.create(
+            user_id=self.user_tech,  
+            company_name="TechKyiv",
+            description="",
+            website=None,
+            industry_id=self.ind_tech,
+            location="Kyiv",
+        )
+        
+        StartupProfile.objects.create(
+            user_id=self.user_bio,  
+            company_name="BioLviv",
+            description="",
+            website=None,
+            industry_id=self.ind_bio,
+            location="Lviv",
+        )
+
+        self.list_url = reverse("profiles:startupprofile-list")
+
+    def test_filter_by_industry_case_insensitive(self):
+        """?industry=tech should return only Tech industry profiles."""
+        res = self.client.get(self.list_url, {"industry": "tech"})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        names = {p["company_name"] for p in res.data}
+        self.assertIn("TechKyiv", names)
+        self.assertNotIn("BioLviv", names)
+
+    def test_filter_by_location_case_insensitive(self):
+        """?location=lviv should return only Lviv profiles."""
+        res = self.client.get(self.list_url, {"location": "lviv"})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        names = {p["company_name"] for p in res.data}
+        self.assertIn("BioLviv", names)
+        self.assertNotIn("TechKyiv", names)
