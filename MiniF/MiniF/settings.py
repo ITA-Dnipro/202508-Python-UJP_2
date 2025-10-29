@@ -3,6 +3,7 @@ import environ
 from datetime import timedelta
 import mongoengine
 import os
+import sys
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -111,6 +112,14 @@ ELASTICSEARCH_DSL = {
 
 }
 
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+
+CELERY_TASK_DEFAULT_RETRY_DELAY = 60
+CELERY_TASK_MAX_RETRIES = 3
+
 LANGUAGE_CODE = env("LANGUAGE_CODE")
 TIME_ZONE = env("TIME_ZONE")
 USE_I18N = True
@@ -143,6 +152,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "users.validators.UppercaseValidator"},
 ]
 
+if 'test' in sys.argv:
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
