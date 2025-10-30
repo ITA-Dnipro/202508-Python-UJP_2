@@ -116,7 +116,7 @@ services:
       - web
 
   krakend:
-    build: ./krakend
+    build: ./MiniF/krakend
     container_name: krakend
     ports:
       - "8080:8080"
