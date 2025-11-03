@@ -22,7 +22,8 @@ class StartupProject(models.Model):
     status = models.CharField(
         max_length=10,
         choices=Status.choices,
-        default=Status.OPEN
+        default=Status.OPEN,
+        blank=True
     )
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(null=True, auto_now=True)
