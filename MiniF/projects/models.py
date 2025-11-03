@@ -19,12 +19,7 @@ class StartupProject(models.Model):
     title = models.CharField(max_length=255)
     likes = models.IntegerField(default=0)
     description = models.TextField()
-    status = models.CharField(
-        max_length=10,
-        choices=Status.choices,
-        default=Status.OPEN,
-        blank=True
-    )
+    status = models.CharField(max_length=20, default=Status.OPEN)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(null=True, auto_now=True)
 
