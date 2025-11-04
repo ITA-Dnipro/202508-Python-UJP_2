@@ -99,7 +99,7 @@ class InvestorProfileViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if InvestorProfile.objects.filter(user_id=user).exists():
             raise ValidationError({"detail": "Investor profile already exists."})
-        serializer.save(user_id=user)
+        serializer.save()
 
 
 def startup_list(request):

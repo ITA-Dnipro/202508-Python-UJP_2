@@ -3,6 +3,7 @@ import environ
 from datetime import timedelta
 import mongoengine
 import os
+import sys
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -34,6 +35,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "dj_rest_auth",
     "dj_rest_auth.registration",
     'rest_framework_simplejwt.token_blacklist',
@@ -81,34 +83,50 @@ TEMPLATES = [
 WSGI_APPLICATION = "MiniF.wsgi.application"
 ASGI_APPLICATION = "MiniF.asgi.application"
 
-if env("DATABASE_URL", default=""):
+try:
     DATABASES = {"default": env.db("DATABASE_URL")}
-else:
+except Exception:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("redis", 6379)],
+try:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("redis", 6379)],
+            },
         },
-    },
-}
-mongoengine.connect(host=env("MONGO_URI"))
+    }
+except Exception:
+    CHANNEL_LAYERS = {
+        "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
+    }
 
-ELASTICSEARCH_DSL = {
+try:
+    mongoengine.connect(host=env("MONGO_URI"))
+except Exception:
+    None # continue execution if mongodb is not raised
 
-    'default': {
+try:
+    ELASTICSEARCH_DSL = {
+        'default': {
+            'hosts': env("ELASTICSEARCH_URL", default="http://elasticsearch:9200")
+        },
+    }
+except Exception:
+    None # continue execution if elasticsearch is not raised
 
-        'hosts': os.getenv('ELASTICSEARCH_URL', 'http://elasticsearch:9200')
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
 
-    },
-
-}
+CELERY_TASK_DEFAULT_RETRY_DELAY = 60
+CELERY_TASK_MAX_RETRIES = 3
 
 LANGUAGE_CODE = env("LANGUAGE_CODE")
 TIME_ZONE = env("TIME_ZONE")
@@ -142,6 +160,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "users.validators.UppercaseValidator"},
 ]
 
+if 'test' in sys.argv:
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
@@ -166,6 +187,18 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": ["email", "profile"],
+        "AUTH_PARAMS": {"access_type": "offline"},
+    }
+}
+
+SOCIALACCOUNT_ADAPTER = "users.adapters.CustomSocialAccountAdapter"
+LOGIN_REDIRECT_URL = "/accounts/email/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"
+ACCOUNT_LOGOUT_REDIRECT_URL = LOGOUT_REDIRECT_URL
 
 
 LOGGING = {

@@ -135,3 +135,5 @@ class StartupDocumentSerializer(DocumentSerializer):
             "location",
             "industry_name",
         )
+
+        ref_name = "profiles"

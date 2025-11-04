@@ -29,6 +29,7 @@ We are committed to delivering a platform that is not just a marketplace for ide
 ### Database schema
 <img width="884" height="783" alt="Screenshot_db" src="https://github.com/user-attachments/assets/50575ba4-a772-4625-8ad3-a7343e90cea2" />
 
+
 ### Saved Startups Analytics Microservice:
 
 An analytics microservice that provides real-time and historical investment insights for Investors, Startups, and the entire platform, enriching their dashboards with monetary and percentage-based statistics.
@@ -49,6 +50,47 @@ Retention Policy: 12-month archive for statistics.
 
 **Sequence diagram**
 <img width="1820" height="618" alt="image" src="https://github.com/user-attachments/assets/f76f688b-e32c-4d73-a3dd-7f77bef9f6ee" />
+
+
+### Comment Micro-Service:
+
+API Gateway: routes, can do rate-limit, auth pass-through.
+
+Comments Service: REST API (FastAPI / Flask).
+
+Auth Service: token validation; can integrate with central auth (JWT).
+
+Projects Service: project_id validation.
+
+DB: PostgreSQL for comments.
+
+MQ: event publishing for notifications, analytics, search index.
+
+**1st: Sequence diagram**
+
+<img width="1517" height="605" alt="image" src="https://github.com/user-attachments/assets/8096f431-5958-41b7-af40-d090b0692eb0" />
+
+
+**2nd: Component diagram**
+
+<img width="2138" height="341" alt="image" src="https://github.com/user-attachments/assets/547ab9e1-f5f7-4bdc-88df-a79661958785" />
+
+
+### Gamification Micro-Service
+
+**Storage:** PostgreSQL (tables for EXP, badges, levels, leaderboards).
+
+**Caching:** Redis for leaderboard performance.
+
+**Event Processing:** Consume platform events (e.g., “project.created”, “investment.made”, “comment.added”) via message queue (RabbitMQ/Kafka).
+
+**API Layer:** REST endpoints for retrieving user stats, badges, levels, and leaderboards.
+
+**Admin Config:** Internal API for adjusting XP values, thresholds, and badge rules.
+
+**Security:** JWT-authenticated endpoints; actions verified by user ID and role.
+
+<img width="1440" height="1081" alt="micros-Сторінка-2 drawio" src="https://github.com/user-attachments/assets/168624ad-2ae8-4b3f-9fba-b1ced84e1bbc" />
 
 
 ### Basic Epics
@@ -108,4 +150,114 @@ Retention Policy: 12-month archive for statistics.
 - Regular feedback from both user groups (startups and investors) should be incorporated.
 
 
+## Database Migration Process
 
+### Creating Migrations 
+
+After making changes to Django models, create new migration files:
+
+```bash
+python manage.py makemigrations
+```
+
+### Applying Migrations
+
+Apply migrations to update the database schema:
+
+```bash
+python manage.py migrate
+```
+
+### Verifying Migration Consistency
+
+Before pushing changes, check that all model changes are reflected in migrations:
+
+```bash
+python manage.py makemigrations --check
+```
+
+This command will fail if there are unapplied model changes.
+
+### Resolving Migration Conflicts or Inconsistencies
+
+If migration files are outdated, duplicated, or broken:
+1. Delete all migration files (`*.py`) in each app’s `migrations/` folder, except `__init__.py`.
+For Linux: 
+
+    ```bash
+    find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+    ```
+For Windows:
+
+     ```bash
+    Get-ChildItem -Path . -Recurse -Include *.py | Where-Object { $_.DirectoryName -match 'migrations' -and $_.Name -ne '__init__.py'} | Remove-Item
+    ```
+
+2. Generate new initial migrations:
+
+    ```bash
+    python manage.py makemigrations
+    ```
+    or 
+    ```bash
+    docker compose exec web python manage.py makemigrations
+    ```
+
+3. Delete the tables from db:
+To connect to the postgresql(you have to compose up the docker before it):
+
+    ```bash
+    psql -U postgres
+    ```
+    or 
+    ```bash
+    docker exec -it minif-db-1  psql -U postgres
+    ```
+
+To stop minif-web-1:
+
+    ```bash
+    docker stop minif-web-1
+    ```
+
+Then we have to delete the db (make sure that minif-web-1 is stopped and pgadmin is closed):
+
+    ```bash
+    DROP DATABASE "miniF-db";
+    \q
+    ```
+
+Then rebuild and start (compose up) the docker. 
+
+To create db:
+
+    ```bash
+    docker exec -it minif-db-1  psql -U postgres
+    CREATE DATABASE "miniF-db";
+    \q
+    ```
+
+3. Apply migrations with:
+
+    ```bash
+    python manage.py migrate 
+    ```
+    or 
+    ```bash
+    docker compose exec web python manage.py migrate 
+    ```
+
+### Automated Checks
+
+CI runs the following checks to ensure migration consistency:
+
+```bash
+python manage.py makemigrations --check
+python manage.py migrate --noinput
+```
+
+### Best Practices
+
+- Do not manually edit migration files.
+- Always commit migration files with model changes.
+- Coordinate major migration resets with the team.

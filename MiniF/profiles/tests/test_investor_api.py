@@ -14,8 +14,8 @@ class InvestorProfileAPITest(APITestCase):
         self.industry = Industry.objects.create(industry_name="Technology")
         self.client.force_authenticate(user=self.user)
 
-        self.list_url = reverse("investorprofile-list")
-        self.detail_url = lambda pk: reverse("investorprofile-detail", kwargs={'pk': pk})
+        self.list_url = reverse("profiles:investorprofile-list")
+        self.detail_url = lambda pk: reverse("profiles:investorprofile-detail", kwargs={'pk': pk})
 
     def test_create_investorprofile(self):
         """Test creating a new investor profile."""

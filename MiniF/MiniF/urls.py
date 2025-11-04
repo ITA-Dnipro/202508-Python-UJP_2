@@ -17,10 +17,12 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/schema/swagger/", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     path("api/users/", include("users.urls")),
-    path("api/profiles/", include("profiles.urls")),
+    path("api/", include("users.urls")),
+    path("api/profiles/", include(("profiles.urls", "profiles"), namespace="profiles")),
     path("api/projects/", include("projects.urls")),
     path("chat/", include("communications.urls")),
     path("profiles/startups/", startup_list),
     path("profiles/startups/<int:startup_id>/", startup_detail),
-    path("notifications/", include("notifications.urls"))
+    path("notifications/", include("notifications.urls")),
+    path("accounts/", include("allauth.urls")),
 ]

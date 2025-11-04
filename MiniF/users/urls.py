@@ -2,7 +2,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from dj_rest_auth.registration.views import VerifyEmailView
 from rest_framework.routers import DefaultRouter
-from .views import UserProfileViewSet, CustomLoginView, CustomLogoutView
+from .views import UserProfileViewSet, CustomLoginView, CustomLogoutView, ConfirmTokenView
 
 router = DefaultRouter()
 router.register(r"", UserProfileViewSet, basename="userprofile")
@@ -24,4 +24,5 @@ urlpatterns = [
         auth_views.PasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
     ),
+    path("auth/confirm-token/", ConfirmTokenView.as_view(), name="confirm-token"),
 ]
