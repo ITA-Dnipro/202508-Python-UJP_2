@@ -70,6 +70,20 @@ MQ: event publishing for notifications, analytics, search index.
 
 <img width="1440" height="1081" alt="micros-Сторінка-2 drawio" src="https://github.com/user-attachments/assets/168624ad-2ae8-4b3f-9fba-b1ced84e1bbc" />
 
+### Community Forum Micro-Service
+
+A dedicated forum microservice that manages all community discussion data. It provides a secure API for topic creation and management, validates user identity via the API gateway, and offers endpoints for browsing content.
+
+**Storage:** PostgreSQL.
+
+**API Gateway:** KrakenD routes public API endpoints.Handles authentication via an internal-call plugin, which validates the user's JWT against the main monolith (web) and injects the user-id into a header.
+
+**API Layer:** REST API (FastAPI) providing full CRUD operations for forum system, including listing, creation, and retrieval.
+
+**Event Publishing:** Uses Redis Pub/Sub to broadcast real-time events for consumption by other microservices.
+
+
+
 ### Basic Epics
 
 0. **As a user of the platform**, I want the ability to represent both as a startup and as an investor company, so that I can engage in the platform's ecosystem from both perspectives using a single account.
