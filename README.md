@@ -30,6 +30,28 @@ We are committed to delivering a platform that is not just a marketplace for ide
 <img width="884" height="783" alt="Screenshot_db" src="https://github.com/user-attachments/assets/50575ba4-a772-4625-8ad3-a7343e90cea2" />
 
 
+### Saved Startups Analytics Microservice:
+
+An analytics microservice that provides real-time and historical investment insights for Investors, Startups, and the entire platform, enriching their dashboards with monetary and percentage-based statistics.
+
+Data Storage: PostgreSQL (primary), Redis (cache), optional time-series DB (InfluxDB / TimescaleDB).
+
+Scheduling: Celery or CRON jobs for daily/monthly statistics creation.
+
+Performance: Cached computations for fast response times.
+
+Security: JWT-based authentication, role-based access (Investor/Startup/Admin).
+
+Scalability: Independent analytics engine, stateless API layer.
+
+Data Model: Supports delta comparison and percentage growth tracking.
+
+Retention Policy: 12-month archive for statistics.
+
+**Sequence diagram**
+<img width="1820" height="618" alt="image" src="https://github.com/user-attachments/assets/f76f688b-e32c-4d73-a3dd-7f77bef9f6ee" />
+
+
 ### Comment Micro-Service:
 
 API Gateway: routes, can do rate-limit, auth pass-through.
