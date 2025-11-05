@@ -44,7 +44,7 @@ class StartupProjectModelTest(TestCase):
     def test_str_method(self):
         """Test string representation"""
         project = StartupProject.objects.create(
-            startup_profile_id=self.profile,
+            startup_profile=self.profile,
             title="Test Project",
             description="Project description",
             status="Active"

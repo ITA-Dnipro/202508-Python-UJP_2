@@ -34,7 +34,7 @@ class StartupProjectAPITest(APITestCase):
     def test_create_project(self):
         """Test creating a new startup project via API."""
         data = {
-            "startup_profile_id": self.startup.id,
+            "startup_profile": self.startup.id,
             "title": "Project Alpha",
             "description": "Project description",
             "status": "Active",
@@ -76,7 +76,7 @@ class StartupProjectAPITest(APITestCase):
             status="Active",
         )
         data = {
-            "startup_profile_id": self.startup.id,
+            "startup_profile": self.startup.id,
             "title": "Project Delta Updated",
             "description": "Updated description",
             "status": "Completed",
