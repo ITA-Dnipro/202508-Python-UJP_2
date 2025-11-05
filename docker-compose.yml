@@ -104,16 +104,26 @@ services:
       - es_data:/usr/share/elasticsearch/data
 
   celery:
-    build: .
+    build: ./MiniF
     command: celery -A MiniF worker -l info
     volumes:
-      - .:/app
+      - ./MiniF:/app
     working_dir: /app
     env_file:
-      - .env
+      - ./MiniF/.env
     depends_on:
       - redis
       - web
+  community-forum:
+    build:
+      context: ./services/Forum/app
+      dockerfile: Dockerfile
+    command: uvicorn main:app --host 0.0.0.0 --port 8082
+    container_name: community-forum
+    env_file: ./services/Forum/app/.env
+    ports:
+      - "8082:8082"
+    
 
   krakend:
     build: ./MiniF/krakend
@@ -126,6 +136,7 @@ services:
       - redis
       - mongodb
       - elasticsearch
+      - community-forum
     environment:
       - KRAKEND_PORT=8080
       - KRAKEND_PLUGINS_ENABLED=true
