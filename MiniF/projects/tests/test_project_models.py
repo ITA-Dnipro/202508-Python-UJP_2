@@ -22,13 +22,13 @@ class StartupProjectModelsTest(TestCase):
 
     def test_create_project_success(self):
         project = StartupProject.objects.create(
-            startup_profile_id=self.startup,
+            startup_profile=self.startup,
             title="Project Alpha",
             likes=5,
             description="Project description",
             status="Active",
         )
-        self.assertEqual(project.startup_profile_id, self.startup)
+        self.assertEqual(project.startup_profile, self.startup)
         self.assertEqual(project.title, "Project Alpha")
         self.assertEqual(project.likes, 5)
         self.assertEqual(project.description, "Project description")
@@ -38,7 +38,7 @@ class StartupProjectModelsTest(TestCase):
 
     def test_create_project_fail_missing_title(self):
         project = StartupProject(
-            startup_profile_id=self.startup, likes=5, description="Missing title", status="Inactive"
+            startup_profile=self.startup, likes=5, description="Missing title", status="Inactive"
         )
         with self.assertRaises(ValidationError):
             project.full_clean()
