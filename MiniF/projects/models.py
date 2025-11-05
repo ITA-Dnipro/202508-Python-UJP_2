@@ -11,7 +11,7 @@ class StartupProject(models.Model):
         OPEN = "open", "Open"
         CLOSED = "closed", "Closed"
 
-    startup_profile_id = models.ForeignKey(
+    startup_profile = models.ForeignKey(
         "profiles.StartupProfile",
         on_delete=models.CASCADE,
         related_name="projects"
