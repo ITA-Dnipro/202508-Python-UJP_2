@@ -82,6 +82,8 @@ A dedicated forum microservice that manages all community discussion data. It pr
 
 **Event Publishing:** Uses Redis Pub/Sub to broadcast real-time events for consumption by other microservices.
 
+<img width="2472" height="5628" alt="image" src="https://github.com/user-attachments/assets/6ceb2c6d-80c0-45aa-ade3-182c27f69458" />
+
 
 
 ### Basic Epics
