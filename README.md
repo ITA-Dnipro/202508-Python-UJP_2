@@ -90,7 +90,23 @@ MQ: event publishing for notifications, analytics, search index.
 
 **Security:** JWT-authenticated endpoints; actions verified by user ID and role.
 
-<img width="1440" height="1081" alt="micros-Сторінка-2 drawio" src="https://github.com/user-attachments/assets/168624ad-2ae8-4b3f-9fba-b1ced84e1bbc" />
+<img width="1440" height="1081" alt="gamification" src="https://github.com/user-attachments/assets/168624ad-2ae8-4b3f-9fba-b1ced84e1bbc" />
+
+### Investment Micro-Service:
+
+Handles creation and management of investment requests between investors and startup projects.
+
+API: REST endpoint — POST /investments/requests/ (Investor-only).
+
+DB: PostgreSQL for storing investment requests and statuses.
+
+Auth: JWT-based (investor role validation).
+
+Notifications: triggers message to startup owner on new request
+
+**Sequence diagram:**
+
+<img width="940" height="513" alt="sequence-diagram" src="https://github.com/user-attachments/assets/c1c274d6-a685-4152-aed4-679604de557d" />
 
 
 ### Basic Epics
