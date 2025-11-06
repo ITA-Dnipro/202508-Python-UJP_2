@@ -108,6 +108,24 @@ Notifications: triggers message to startup owner on new request
 
 <img width="940" height="513" alt="sequence-diagram" src="https://github.com/user-attachments/assets/c1c274d6-a685-4152-aed4-679604de557d" />
 
+### Smart Matching Micro-Service:
+
+* **API Gateway (KrakenD):** Routes requests between monolith, and microservice; performs token validation (auth pass-through), rate limiting.
+
+* **Smart Matching Service (FastAPI):** REST API for calculating similarity between startups and investors; accepts profile descriptions, generates embeddings, calculates cosine similarity.
+
+* **Projects & Profiles Service (Monolith):** Provides data on startups and investors for building vectors.
+
+* **Vector DB (Qdrant):** Stores vectors of startup and investor descriptions, performs similarity search (cosine similarity).
+
+* **ML Embedding Model:** Converts text descriptions into numerical vectors (SentenceTransformers / HuggingFace).
+
+* **Redis (optional):** Used as a cache for recent recommendation requests.
+
+**Sequence diagram:**
+
+<img width="1293" height="657" alt="image" src="https://github.com/user-attachments/assets/bfb71513-74f7-45e5-94c1-b08156333767" />
+
 ### Community Forum Micro-Service
 
 A dedicated forum microservice that manages all community discussion data. It provides a secure API for topic creation and management, validates user identity via the API gateway, and offers endpoints for browsing content.
