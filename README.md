@@ -108,6 +108,21 @@ Notifications: triggers message to startup owner on new request
 
 <img width="940" height="513" alt="sequence-diagram" src="https://github.com/user-attachments/assets/c1c274d6-a685-4152-aed4-679604de557d" />
 
+### Community Forum Micro-Service
+
+A dedicated forum microservice that manages all community discussion data. It provides a secure API for topic creation and management, validates user identity via the API gateway, and offers endpoints for browsing content.
+
+**Storage:** PostgreSQL.
+
+**API Gateway:** KrakenD routes public API endpoints.Handles authentication via an internal-call plugin, which validates the user's JWT against the main monolith (web) and injects the user-id into a header.
+
+**API Layer:** REST API (FastAPI) providing full CRUD operations for forum system, including listing, creation, and retrieval.
+
+**Event Publishing:** Uses Redis Pub/Sub to broadcast real-time events for consumption by other microservices.
+
+<img width="2472" height="5628" alt="image" src="https://github.com/user-attachments/assets/6ceb2c6d-80c0-45aa-ade3-182c27f69458" />
+
+
 
 ### Basic Epics
 
