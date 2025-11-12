@@ -190,6 +190,168 @@
       }
     },
     {
+    "endpoint": "/api/v1/topics",
+    "method": "POST",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/v1/topics/",
+        "host": ["http://community-forum:8082"],
+        "method": "POST",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  },
+
+  {
+    "endpoint": "/api/v1/topics/",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/v1/topics/",
+        "host": ["http://community-forum:8082"],
+        "method": "GET",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  },
+
+
+  {
+    "endpoint": "/api/v1/topics/{topic_id}",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/v1/topics/{topic_id}",
+        "host": ["http://community-forum:8082"],
+        "method": "GET",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  },
+
+  {
+    "endpoint": "/api/v1/topics/{topic_id}",
+    "method": "PATCH",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/v1/topics/{topic_id}",
+        "host": ["http://community-forum:8082"],
+        "method": "PATCH",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  },
+
+
+  {
+    "endpoint": "/api/v1/topics/{topic_id}",
+    "method": "DELETE",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/v1/topics/{topic_id}",
+        "host": ["http://community-forum:8082"],
+        "method": "DELETE",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  },
+
+  {
       "endpoint": "/chat/api/conversations/{id}/messages/",
       "method": "GET",
       "output_encoding": "no-op",
