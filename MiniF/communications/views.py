@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from users.models import UserProfile
 from users.permissions import IsStartupRole, IsInvestorRole
 
-from .models import ChatRoom, Message
+from .models import ChatRoom, Message # pylint: disable=no-member
 from .serializers import ChatRoomSerializer, MessageSerializer
 
 
