@@ -188,6 +188,121 @@
           "message": "Unauthorized"
         }
       }
+    },
+    {
+      "endpoint": "/chat/api/conversations/{id}/messages/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/chat/api/conversations/{id}/messages/",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/chat/api/messages/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/chat/api/messages/",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/chat/api/messages/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/chat/api/messages/",
+          "host": ["http://web:8000"],
+          "method": "POST",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/comments/projects/{id}/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/comments/projects/{id}/",
+          "host": ["http://comment:8001"],
+          "method": "GET",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/comments/projects/{id}/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "output_headers": ["*"],
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/comments/projects/{id}/",
+          "host": ["http://comment:8001"],
+          "method": "POST",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
     }
   ],
   "timeout": "3s",

@@ -126,6 +126,8 @@ services:
     working_dir: /app
     env_file:
       ./MiniF/.env
+    environment:
+      - PYTHONPATH=/app:/app/MiniF
     depends_on:
       - redis
       - web

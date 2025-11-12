@@ -77,12 +77,14 @@ class ConversationViewSet(viewsets.ViewSet):
     @action(detail=True, methods=["get"])
     def messages(self, request, pk=None):
         try:
-            room = ChatRoom.objects.get(id=pk)  # Added to actually raise DoesNotExist if room invalid
-            messages = Message.objects.filter(room=room).order_by("timestamp")  # pylint: disable=no-member
+            room = ChatRoom.objects.get(id=pk)
+            messages = Message.objects.filter(room_id=int(room.id)).order_by("timestamp")
             serializer = MessageSerializer(messages, many=True)
             return Response(serializer.data)
-        except ChatRoom.DoesNotExist as exc:
-            raise NotFound("Conversation not found") from exc
+        except ChatRoom.DoesNotExist:
+            raise NotFound("Conversation not found")
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
 
 
 class MessageViewSet(viewsets.ModelViewSet):

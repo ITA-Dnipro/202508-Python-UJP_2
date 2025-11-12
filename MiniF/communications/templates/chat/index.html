@@ -29,24 +29,28 @@
             const token = document.getElementById('token').value;
             const username = document.getElementById('username').value;
 
-            const response = await fetch('http://127.0.0.1:8000/chat/api/conversations/', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username: username }),
-            });
+            try {
+                const response = await fetch('http://127.0.0.1:8080/chat/api/conversations/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username }),
+                });
 
-            const data = await response.json();
-            const messageDiv = document.getElementById('message');
+                const data = await response.json();
+                const messageDiv = document.getElementById('message');
 
-            if (response.ok) {
-                // Redirect to chat with the room ID
-                window.location.href = `chat.html?roomId=${data.id}&token=${token}&username=${username}`;
-            } else {
-                messageDiv.innerText = `Error: ${data.error || 'Failed to login'}`;
-                messageDiv.style.color = 'red';
+                if (response.ok) {
+                    window.location.href = `room.html?roomId=${data.id}&token=${token}&username=${username}`;
+                } else {
+                    messageDiv.innerText = `Error: ${data.error || 'Failed to login'}`;
+                    messageDiv.style.color = 'red';
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('message').innerText = 'Network error, try again later.';
             }
         });
     </script>
