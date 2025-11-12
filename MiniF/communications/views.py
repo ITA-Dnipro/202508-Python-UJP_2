@@ -41,7 +41,10 @@ class ConversationViewSet(viewsets.ViewSet):
             current_user, role = get_user_and_role_from_headers(request)
             username = request.data.get("username")
             if not username:
-                return Response({"error": "Username is required"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Username is required"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             try:
                 other_user = UserProfile.objects.get(username=username)
@@ -49,41 +52,65 @@ class ConversationViewSet(viewsets.ViewSet):
                 raise NotFound("User not found") from exc
 
             if current_user == other_user:
-                return Response({"error": "Cannot chat with yourself"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Cannot chat with yourself"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             if role == "startup":
                 room = (
-                    ChatRoom.objects.filter(investor=other_user, startup=current_user).first()
-                    or ChatRoom.objects.create(investor=other_user, startup=current_user)
+                    ChatRoom.objects.filter(
+                        investor=other_user, startup=current_user
+                    ).first()
+                    or ChatRoom.objects.create(
+                        investor=other_user, startup=current_user
+                    )
                 )
             elif role == "investor":
                 room = (
-                    ChatRoom.objects.filter(investor=current_user, startup=other_user).first()
-                    or ChatRoom.objects.create(investor=current_user, startup=other_user)
+                    ChatRoom.objects.filter(
+                        investor=current_user, startup=other_user
+                    ).first()
+                    or ChatRoom.objects.create(
+                        investor=current_user, startup=other_user
+                    )
                 )
             else:
-                return Response({"error": f"Invalid role: {role}"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": f"Invalid role: {role}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             serializer = ChatRoomSerializer(room)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         except PermissionDenied as exc:
-            return Response({"error": str(exc)}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"error": str(exc)}, status=status.HTTP_401_UNAUTHORIZED
+            )
         except Exception as exc:  # pylint: disable=broad-exception-caught
-            return Response({"error": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=True, methods=["get"])
     def messages(self, request, pk=None):
         """Return all messages for a conversation."""
         try:
             room = ChatRoom.objects.get(id=pk)
-            messages_qs = Message.objects.filter(room_id=int(room.id)).order_by("timestamp")  # type: ignore[attr-defined]
+            # MongoEngine uses `Message.objects` but pylint can't detect it
+            messages_qs = (
+                Message.objects.filter(room_id=int(room.id))
+                .order_by("timestamp")  # type: ignore[attr-defined]
+            )
             serializer = MessageSerializer(messages_qs, many=True)
             return Response(serializer.data)
         except ChatRoom.DoesNotExist as exc:
             raise NotFound("Conversation not found") from exc
         except Exception as exc:  # pylint: disable=broad-exception-caught
-            return Response({"error": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -96,7 +123,13 @@ class MessageViewSet(viewsets.ModelViewSet):
         """Return messages in rooms where user is a participant."""
         user, _ = get_user_and_role_from_headers(self.request)
         user_rooms = ChatRoom.objects.filter(Q(investor=user) | Q(startup=user))
-        return Message.objects.filter(room__in=user_rooms).order_by("-created_at")  # type: ignore[attr-defined]
+
+        # Split the long query for readability and pylint compliance
+        messages_query = Message.objects.filter(  # type: ignore[attr-defined]
+            room__in=user_rooms
+        ).order_by("-created_at")
+
+        return messages_query
 
     def perform_create(self, serializer):
         """Validate and save a new message."""
