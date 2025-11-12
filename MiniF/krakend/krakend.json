@@ -465,6 +465,52 @@
           }
         }
       ]
+    },
+    {
+      "endpoint": "/api/comments/{comment_id}/",
+      "method": "PATCH",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/comments/{comment_id}/",
+          "host": ["http://comment:8001"],
+          "method": "PATCH",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/comments/{comment_id}/",
+      "method": "DELETE",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/comments/{comment_id}/",
+          "host": ["http://comment:8001"],
+          "method": "DELETE",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
     }
   ],
   "timeout": "3s",
