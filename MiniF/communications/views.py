@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from users.models import UserProfile
 from users.permissions import IsStartupRole, IsInvestorRole
 
-from .models import ChatRoom, Message # pylint: disable=no-member
+from .models import ChatRoom, Message
 from .serializers import ChatRoomSerializer, MessageSerializer
 
 
@@ -98,10 +98,9 @@ class ConversationViewSet(viewsets.ViewSet):
         """Return all messages for a conversation."""
         try:
             room = ChatRoom.objects.get(id=pk)
-            # MongoEngine uses `Message.objects` but pylint can't detect it
             messages_qs = (
-                Message.objects.filter(room_id=int(room.id))
-                .order_by("timestamp")  # type: ignore[attr-defined]
+                Message.objects.filter(room_id=int(room.id))  # pylint: disable=no-member
+                .order_by("timestamp")
             )
             serializer = MessageSerializer(messages_qs, many=True)
             return Response(serializer.data)
@@ -124,8 +123,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         user, _ = get_user_and_role_from_headers(self.request)
         user_rooms = ChatRoom.objects.filter(Q(investor=user) | Q(startup=user))
 
-        # Split the long query for readability and pylint compliance
-        messages_query = Message.objects.filter(  # type: ignore[attr-defined]
+        messages_query = Message.objects.filter(  # pylint: disable=no-member
             room__in=user_rooms
         ).order_by("-created_at")
 
