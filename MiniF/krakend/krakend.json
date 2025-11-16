@@ -490,6 +490,122 @@
       ]
     },
     {
+      "endpoint": "/api/projects/startup-projects/{id}/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/projects/startup-projects/{id}/",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "proxy/sequential": true,
+        "proxy/error_handler": {
+          "status_code": 401,
+          "message": "Unauthorized"
+        }
+      }
+    },
+    {
+      "endpoint": "/investments/requests/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/investments/requests/",
+          "host": ["http://investment-svc:8005"],
+          "method": "POST",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "proxy/sequential": true,
+        "proxy/error_handler": {
+          "status_code": 401,
+          "message": "Unauthorized"
+        }
+      }
+    },
+    {
+      "endpoint": "/notifications/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/notifications/",
+          "host": ["http://web:8000"],
+          "method": "POST",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "proxy/sequential": true,
+        "proxy/error_handler": {
+          "status_code": 401,
+          "message": "Unauthorized"
+        }
+      }
+    },
+    {
+      "endpoint": "/notifications/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/notifications/",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "proxy/sequential": true,
+        "proxy/error_handler": {
+          "status_code": 401,
+          "message": "Unauthorized"
+        }
+      }
+    },
+    {
       "endpoint": "/api/comments/{comment_id}/",
       "method": "DELETE",
       "output_encoding": "no-op",
