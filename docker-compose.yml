@@ -124,8 +124,8 @@ services:
       - web
       - db
       - redis
-      #- mongodb
-      #- elasticsearch
+      - mongodb
+      - elasticsearch
     environment:
       - KRAKEND_PORT=8080
       - KRAKEND_PLUGINS_ENABLED=true
