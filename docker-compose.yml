@@ -141,6 +141,48 @@ services:
     ports:
       - "8082:8082"
     
+  events:
+    build:
+      context: ./services/Events
+      dockerfile: Dockerfile
+    command: uvicorn events_app.main:app --host 0.0.0.0 --port 8006
+    volumes:
+      - ./services/Events:/app
+    ports:
+     - "8006:8006"
+    env_file:
+      - ./services/Events/.env.example
+    depends_on:
+      - db
+      - redis
+
+  events-celery-worker:
+    build:
+      context: ./services/Events
+      dockerfile: Dockerfile
+    command: celery -A events_app.celery_app worker -l info 
+    volumes:
+      - ./services/Events:/app
+    working_dir: /app
+    env_file:
+      - ./services/Events/.env.example
+    depends_on:
+      - redis
+      - db 
+
+  events-celery-beat: 
+    build:
+      context: ./services/Events
+      dockerfile: Dockerfile
+    command: celery -A events_app.celery_app beat -l info
+    volumes:
+      - ./services/Events:/app
+    working_dir: /app
+    env_file:
+      - ./services/Events/.env.example
+    depends_on:
+      - redis
+      - db
 
   krakend:
     build: ./MiniF/krakend
@@ -155,6 +197,7 @@ services:
       - elasticsearch
       - community-forum
       - comment
+      - events
     environment:
       - KRAKEND_PORT=8080
       - KRAKEND_PLUGINS_ENABLED=true
