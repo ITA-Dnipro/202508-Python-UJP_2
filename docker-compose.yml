@@ -124,13 +124,30 @@ services:
       - web
       - db
       - redis
-      - mongodb
-      - elasticsearch
+      #- mongodb
+      #- elasticsearch
     environment:
       - KRAKEND_PORT=8080
       - KRAKEND_PLUGINS_ENABLED=true
       - KRAKEND_PLUGINS_DIR=/etc/krakend/plugins
     restart: unless-stopped
+
+  smartmatching:
+    build:
+      context: ./services/Smartmatching
+      dockerfile: Dockerfile
+    container_name: smartmatching
+    env_file:
+      - ./services/Smartmatching/.env
+    ports:
+      - "8003:8003"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./services/Smartmatching/app:/app/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8003 --reload
+
 
 volumes:
   postgres_data:
