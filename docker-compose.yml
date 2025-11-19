@@ -204,6 +204,26 @@ services:
       - KRAKEND_PLUGINS_DIR=/etc/krakend/plugins
     restart: unless-stopped
 
+  smartmatching:
+    build:
+      context: ./services/Smartmatching
+      dockerfile: Dockerfile
+    container_name: smartmatching
+    env_file:
+      - ./services/Smartmatching/.env
+    ports:
+      - "8003:8003"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - HF_HOME=/app/cache/huggingface
+    volumes:
+      - ./services/Smartmatching/app:/app/app
+      - ./models_cache:/app/cache
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8003 --reload
+
+
 volumes:
   postgres_data:
   redis_data:

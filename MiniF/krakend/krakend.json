@@ -97,7 +97,7 @@
             "plugin/req-resp-modifier": {
               "name": ["internal-call"],
               "internal-call": {
-                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
               }
             }
           }
@@ -121,7 +121,7 @@
             "plugin/req-resp-modifier": {
               "name": ["internal-call"],
               "internal-call": {
-                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
               }
             }
           }
@@ -135,6 +135,28 @@
         }
       }
     },
+    {
+  "endpoint": "/api/smart-matching/search",
+  "method": "POST",
+  "output_encoding": "no-op",
+  "input_headers": ["*"],
+  "backend": [
+    {
+      "url_pattern": "/api/smart-matching/search",
+      "host": ["http://smartmatching:8003"],
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "plugin/req-resp-modifier": {
+          "name": ["internal-call"],
+          "internal-call": {
+            "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+          }
+        }
+      }
+    }
+  ]
+},
     {
       "endpoint": "/chat/",
       "method": "GET",
@@ -175,7 +197,7 @@
             "plugin/req-resp-modifier": {
               "name": ["internal-call"],
               "internal-call": {
-                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
               }
             }
           }
