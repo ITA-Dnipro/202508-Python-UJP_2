@@ -351,12 +351,98 @@
         "message": "Unauthorized"
       }
     }
-  }
-
-  
-  
+  },
+  {
+      "endpoint": "/api/events/{id}/register",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/events/{id}/register",
+          "host": ["http://events:8006"],
+          "method": "POST",
+          "encoding": "json",
+          "allow": ["*"],
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "proxy/sequential": true,
+        "proxy/error_handler": {
+          "status_code": 401,
+          "message": "Unauthorized"
+        }
+      }
+    },
+    {
+      "endpoint": "/api/events/{id}/register",
+      "method": "DELETE",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/events/{id}/register",
+          "host": ["http://events:8006"],
+          "method": "DELETE",
+          "encoding": "json",
+          "allow": ["*"],
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "proxy/sequential": true,
+        "proxy/error_handler": {
+          "status_code": 401,
+          "message": "Unauthorized"
+        }
+      }
+    },
+    {
+      "endpoint": "/api/events/{id}/participants",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/events/{id}/participants",
+          "host": ["http://events:8006"],
+          "method": "GET",
+          "encoding": "json",
+          "allow": ["*"],
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "proxy/sequential": true,
+        "proxy/error_handler": {
+          "status_code": 401,
+          "message": "Unauthorized"
+        }
+      }
+    }
    
-
   ],
   "timeout": "3s",
   "cache_ttl": "300s",
