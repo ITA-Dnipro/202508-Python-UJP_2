@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 
 services:
   web:
@@ -16,19 +16,20 @@ services:
     depends_on:
       - db
 
-   comment:
-     build:
-       context: ./services/Comment
-       dockerfile: Dockerfile
-     ports:
-       - "8001:8001"
-     volumes:
-       - ./services/Comment:/app
-     env_file:
-       - ./services/Comment/.env
-     depends_on:
-       - mongodb
-       - redis
+  comment:
+    build:
+      context: ./services/Comment
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./services/Comment:/app
+    env_file:
+      - ./services/Comment/.env
+    depends_on:
+      - mongodb
+      - redis
+
 
   test:
     build:
@@ -101,87 +102,104 @@ services:
     volumes:
       - mongodb_data:/data/db
 
-   elasticsearch:
-     image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
-     container_name: elasticsearch
-     environment:
-       - discovery.type=single-node
-       - xpack.security.enabled=false
-       - ES_JAVA_OPTS=-Xms512m -Xmx512m
-     ports: ["9200:9200"]
-     healthcheck:
-       test: ["CMD", "curl", "-f", "http://localhost:9200"]
-       interval: 10s
-       timeout: 10s
-       retries: 5
-     volumes:
-       - es_data:/usr/share/elasticsearch/data
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports: ["9200:9200"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
 
-   celery:
-     build: ./MiniF
-     command: celery -A MiniF worker -l info
-     volumes:
-       - ./MiniF:/app
-     working_dir: /app
-     env_file:
-       ./MiniF/.env
-     environment:
-       - PYTHONPATH=/app:/app/MiniF
-     depends_on:
-       - redis
-       - web
-   community-forum:
-     build:
-       context: ./services/Forum/app
-       dockerfile: Dockerfile
-     command: uvicorn main:app --host 0.0.0.0 --port 8082
-     container_name: community-forum
-     env_file: ./services/Forum/app/.env
-     ports:
-       - "8082:8082"
+  celery:
+    build: ./MiniF
+    command: celery -A MiniF worker -l info
+    volumes:
+      - ./MiniF:/app
+    working_dir: /app
+    env_file:
+      ./MiniF/.env
+    environment:
+      - PYTHONPATH=/app:/app/MiniF
+    depends_on:
+      - redis
+      - web
+  community-forum:
+    build:
+      context: ./services/Forum/app
+      dockerfile: Dockerfile
+    command: uvicorn main:app --host 0.0.0.0 --port 8082
+    container_name: community-forum
+    env_file: ./services/Forum/app/.env
+    ports:
+      - "8082:8082"
 
-   events:
-     build:
-       context: ./services/Events
-       dockerfile: Dockerfile
-     command: uvicorn events_app.main:app --host 0.0.0.0 --port 8006
-     volumes:
-       - ./services/Events:/app
-     ports:
-      - "8006:8006"
-     env_file:
-       - ./services/Events/.env.example
-     depends_on:
-       - db
-       - redis
+  events:
+    build:
+      context: ./services/Events
+      dockerfile: Dockerfile
+    command: uvicorn events_app.main:app --host 0.0.0.0 --port 8006
+    volumes:
+      - ./services/Events:/app
+    ports:
+     - "8006:8006"
+    env_file:
+      - ./services/Events/.env.example
+    depends_on:
+      - db
+      - redis
 
-   events-celery-worker:
-     build:
-       context: ./services/Events
-       dockerfile: Dockerfile
-     command: celery -A events_app.celery_app worker -l info
-     volumes:
-       - ./services/Events:/app
-     working_dir: /app
-     env_file:
-       - ./services/Events/.env.example
-     depends_on:
-       - redis
-       - db
+  events-celery-worker:
+    build:
+      context: ./services/Events
+      dockerfile: Dockerfile
+    command: celery -A events_app.celery_app worker -l info
+    volumes:
+      - ./services/Events:/app
+    working_dir: /app
+    env_file:
+      - ./services/Events/.env.example
+    depends_on:
+      - redis
+      - db
 
-   events-celery-beat:
-     build:
-       context: ./services/Events
-       dockerfile: Dockerfile
-     command: celery -A events_app.celery_app beat -l info
-     volumes:
-       - ./services/Events:/app
-     working_dir: /app
-     env_file:
-       - ./services/Events/.env.example
-     depends_on:
-       - redis
-       - db
+  events-celery-beat:
+    build:
+      context: ./services/Events
+      dockerfile: Dockerfile
+    command: celery -A events_app.celery_app beat -l info
+    volumes:
+      - ./services/Events:/app
+    working_dir: /app
+    env_file:
+      - ./services/Events/.env.example
+    depends_on:
+      - redis
+      - db
+
+  gamification:
+    build:
+      context: ./services/Gamification
+      dockerfile: Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8004 --reload
+    container_name: gamification
+    ports:
+      - "8004:8004"
+    volumes:
+      - ./services/Gamification:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:585662vcxz@db:5432/miniF_db
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
 
   krakend:
     build: ./MiniF/krakend
@@ -192,11 +210,12 @@ services:
       - web
       - db
       - redis
-       - mongodb
-       - elasticsearch
-       - community-forum
-       - comment
-       - events
+      - mongodb
+      - elasticsearch
+      - community-forum
+      - comment
+      - events
+      - gamification
     environment:
       - KRAKEND_PORT=8080
       - KRAKEND_PLUGINS_ENABLED=true
@@ -221,6 +240,7 @@ services:
       - ./services/Smartmatching/app:/app/app
       - ./models_cache:/app/cache
     command: ./run.sh
+
 
 volumes:
   postgres_data:
