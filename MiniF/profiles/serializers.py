@@ -57,7 +57,8 @@ class StartupProfileCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StartupProfile
-        fields = ["company_name", "description", "website", "industry_id", "location"]
+        fields = ["id", "company_name", "description", "website", "industry_id", "location"]
+        read_only_fields = ["id"]
 
     def create(self, validated_data):
         user = self.context["request"].user
@@ -92,7 +93,8 @@ class InvestorProfileCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InvestorProfile
-        fields = ["investment_focus", "location"]
+        fields = ["id", "investment_focus", "location"]
+        read_only_fields = ["id"]
 
     def create(self, validated_data):
         user = self.context["request"].user

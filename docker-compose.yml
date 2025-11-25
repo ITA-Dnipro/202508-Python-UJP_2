@@ -129,6 +129,87 @@ services:
     depends_on:
       - redis
       - web
+  community-forum:
+    build:
+      context: ./services/Forum/app
+      dockerfile: Dockerfile
+    command: uvicorn main:app --host 0.0.0.0 --port 8082
+    container_name: community-forum
+    env_file: ./services/Forum/app/.env
+    ports:
+      - "8082:8082"
+    
+  events:
+    build:
+      context: ./services/Events
+      dockerfile: Dockerfile
+    command: uvicorn events_app.main:app --host 0.0.0.0 --port 8006
+    volumes:
+      - ./services/Events:/app
+    ports:
+     - "8006:8006"
+    env_file:
+      - ./services/Events/.env.example
+    depends_on:
+      - db
+      - redis
+
+  events-celery-worker:
+    build:
+      context: ./services/Events
+      dockerfile: Dockerfile
+    command: celery -A events_app.celery_app worker -l info 
+    volumes:
+      - ./services/Events:/app
+    working_dir: /app
+    env_file:
+      - ./services/Events/.env.example
+    depends_on:
+      - redis
+      - db 
+
+  events-celery-beat: 
+    build:
+      context: ./services/Events
+      dockerfile: Dockerfile
+    command: celery -A events_app.celery_app beat -l info
+    volumes:
+      - ./services/Events:/app
+    working_dir: /app
+    env_file:
+      - ./services/Events/.env.example
+    depends_on:
+      - redis
+      - db
+  
+  gamification:
+    build:
+      context: ./services/Gamification
+      dockerfile: Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8004 --reload
+    container_name: gamification
+    ports:
+      - "8004:8004"
+    volumes:
+      - ./services/Gamification:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:585662vcxz@db:5432/miniF_db
+    env_file:
+      - ./services/Gamification/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
 
   krakend:
     build: ./MiniF/krakend
@@ -142,6 +223,9 @@ services:
       - mongodb
       - elasticsearch
       - comment
+      - events
+      - gamification
+      - rabbitmq
     environment:
       - KRAKEND_PORT=8080
       - KRAKEND_PLUGINS_ENABLED=true

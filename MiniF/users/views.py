@@ -1,10 +1,15 @@
 import logging
+import pika
+import json
+from django.conf import settings
 from django.http import JsonResponse
+from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from users.permissions import _get_role_from_request
 from .models import UserProfile
 from .serializers import (
     UserProfileSerializer,
@@ -34,7 +39,53 @@ class CustomLoginView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = CustomLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        
+        email = request.data.get('email')
+        user = UserProfile.objects.get(email=email)
+        role = request.data.get('role')
+
+        today = timezone.now().date()
+        if user.last_login is None or user.last_login.date() < today:
+            self.publish_daily_login_event(user, role)
+        
+        user.last_login = timezone.now()
+        user.save(update_fields=['last_login'])
+
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+    def publish_daily_login_event(self, user, role):
+        logger.info(f"Attempting to connect to RabbitMQ at {settings.RABBITMQ_HOST}")
+        
+        try:
+            connection = pika.BlockingConnection(
+                pika.ConnectionParameters(host=settings.RABBITMQ_HOST)
+            )
+            channel = connection.channel()
+            
+            channel.exchange_declare(exchange=settings.RABBITMQ_EXCHANGE, exchange_type='topic', durable=True)
+            
+            routing_key = 'daily.login'
+            
+            message_body = json.dumps({
+                "user_id": user.id,
+                "reference_id": None,
+                "role": role
+            })
+            
+            channel.basic_publish(
+                exchange=settings.RABBITMQ_EXCHANGE,
+                routing_key=routing_key,
+                body=message_body,
+                properties=pika.BasicProperties(
+                    delivery_mode=pika.DeliveryMode.Persistent
+                )
+            )
+            
+            logger.info(f"Published {routing_key} event for user {user.id}")
+            connection.close()
+            
+        except Exception as e:
+            logger.error(f"Failed to publish RabbitMQ message: {e}")
 
 
 def test_user(request):
