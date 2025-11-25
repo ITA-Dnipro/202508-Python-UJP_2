@@ -13,65 +13,104 @@
     </style>
 </head>
 <body>
+    <h2>Chat Room</h2>
     <div id="chatBox"></div>
     <input type="text" id="messageInput" placeholder="Type a message...">
     <button id="sendButton">Send</button>
     <div id="status"></div>
 
     <script>
-        // Get query parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const roomId = urlParams.get('roomId');
-        const token = urlParams.get('token');
-        const username = urlParams.get('username');
+        const params = new URLSearchParams(window.location.search);
+        const roomId = params.get('roomId');
+        const token = params.get('token');
+        const username = params.get('username');
+
+        const chatBox = document.getElementById('chatBox');
+        const status = document.getElementById('status');
 
         if (!roomId || !token || !username) {
-            document.getElementById('status').innerText = 'Invalid session. Please login again.';
-            document.getElementById('status').style.color = 'red';
+            status.innerText = 'Invalid session. Please login again.';
+            status.style.color = 'red';
             setTimeout(() => window.location.href = 'index.html', 2000);
             throw new Error('Missing parameters');
         }
 
-        // WebSocket connection
+        // --- Fetch existing messages (через Krakend) ---
+        async function loadMessages() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8080/chat/api/conversations/${roomId}/messages/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    data.forEach(msg => {
+                        const msgDiv = document.createElement('div');
+                        msgDiv.textContent = `${msg.sender_username}: ${msg.content}`;
+                        chatBox.appendChild(msgDiv);
+                    });
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                } else {
+                    status.innerText = 'Failed to load messages';
+                    status.style.color = 'red';
+                }
+            } catch {
+                status.innerText = 'Network error loading messages.';
+                status.style.color = 'red';
+            }
+        }
+
+        loadMessages();
+
+        // --- WebSocket connection (напряму) ---
         const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomId}/?token=${token}`);
 
         ws.onopen = () => {
-            document.getElementById('status').innerText = 'Connected to chat!';
-            document.getElementById('status').style.color = 'green';
+            status.innerText = 'Connected!';
+            status.style.color = 'green';
         };
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const chatBox = document.getElementById('chatBox');
-            const messageDiv = document.createElement('div');
-            messageDiv.innerText = `${data.sender}: ${data.message}`;
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest
+            const msgDiv = document.createElement('div');
+            msgDiv.textContent = `${data.sender}: ${data.message}`;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
         };
 
-        ws.onerror = (error) => {
-            document.getElementById('status').innerText = 'WebSocket error: ' + error;
-            document.getElementById('status').style.color = 'red';
+        ws.onerror = () => {
+            status.innerText = 'WebSocket error';
+            status.style.color = 'red';
         };
 
         ws.onclose = () => {
-            document.getElementById('status').innerText = 'Disconnected from chat.';
-            document.getElementById('status').style.color = 'red';
+            status.innerText = 'Disconnected';
+            status.style.color = 'red';
         };
 
-        document.getElementById('sendButton').addEventListener('click', () => {
-            const message = document.getElementById('messageInput').value;
-            if (message) {
-                ws.send(JSON.stringify({ message: message }));
-                document.getElementById('messageInput').value = '';
-            }
+        // --- Send message ---
+        document.getElementById('sendButton').addEventListener('click', async () => {
+            const message = document.getElementById('messageInput').value.trim();
+            if (!message) return;
+
+            // Надсилаємо через WebSocket
+            ws.send(JSON.stringify({ message }));
+
+            // І зберігаємо у БД через Krakend
+            await fetch(`http://127.0.0.1:8080/chat/api/messages/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ room: roomId, content: message })
+            });
+
+            document.getElementById('messageInput').value = '';
         });
 
-        // Allow sending with Enter key
-        document.getElementById('messageInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('sendButton').click();
-            }
+        // Enter = send
+        document.getElementById('messageInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') document.getElementById('sendButton').click();
         });
     </script>
 </body>
