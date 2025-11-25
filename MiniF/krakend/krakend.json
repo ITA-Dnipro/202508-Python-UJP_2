@@ -97,7 +97,7 @@
             "plugin/req-resp-modifier": {
               "name": ["internal-call"],
               "internal-call": {
-                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
               }
             }
           }
@@ -121,7 +121,7 @@
             "plugin/req-resp-modifier": {
               "name": ["internal-call"],
               "internal-call": {
-                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
               }
             }
           }
@@ -135,6 +135,28 @@
         }
       }
     },
+    {
+  "endpoint": "/api/smart-matching/search",
+  "method": "POST",
+  "output_encoding": "no-op",
+  "input_headers": ["*"],
+  "backend": [
+    {
+      "url_pattern": "/api/smart-matching/search",
+      "host": ["http://smartmatching:8003"],
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "plugin/req-resp-modifier": {
+          "name": ["internal-call"],
+          "internal-call": {
+            "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+          }
+        }
+      }
+    }
+  ]
+},
     {
       "endpoint": "/chat/",
       "method": "GET",
@@ -175,7 +197,7 @@
             "plugin/req-resp-modifier": {
               "name": ["internal-call"],
               "internal-call": {
-                  "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
               }
             }
           }
@@ -188,7 +210,457 @@
           "message": "Unauthorized"
         }
       }
+    },
+    {
+    "endpoint": "/api/v1/topics",
+    "method": "POST",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/v1/topics/",
+        "host": ["http://community-forum:8082"],
+        "method": "POST",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
     }
+  },
+
+  {
+    "endpoint": "/api/v1/topics/",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/v1/topics/",
+        "host": ["http://community-forum:8082"],
+        "method": "GET",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  },
+
+
+  {
+    "endpoint": "/api/v1/topics/{topic_id}",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/v1/topics/{topic_id}",
+        "host": ["http://community-forum:8082"],
+        "method": "GET",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  },
+
+  {
+    "endpoint": "/api/v1/topics/{topic_id}",
+    "method": "PATCH",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/v1/topics/{topic_id}",
+        "host": ["http://community-forum:8082"],
+        "method": "PATCH",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  },
+
+
+  {
+    "endpoint": "/api/v1/topics/{topic_id}",
+    "method": "DELETE",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/v1/topics/{topic_id}",
+        "host": ["http://community-forum:8082"],
+        "method": "DELETE",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  },
+
+  {
+      "endpoint": "/chat/api/conversations/{id}/messages/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/chat/api/conversations/{id}/messages/",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/chat/api/messages/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/chat/api/messages/",
+          "host": ["http://web:8000"],
+          "method": "GET",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/chat/api/messages/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/chat/api/messages/",
+          "host": ["http://web:8000"],
+          "method": "POST",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/comments/projects/{id}/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/comments/projects/{id}/",
+          "host": ["http://comment:8001"],
+          "method": "GET",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/comments/projects/{id}/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "output_headers": ["*"],
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/comments/projects/{id}/",
+          "host": ["http://comment:8001"],
+          "method": "POST",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/comments/{comment_id}/",
+      "method": "PATCH",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/comments/{comment_id}/",
+          "host": ["http://comment:8001"],
+          "method": "PATCH",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/comments/{comment_id}/",
+      "method": "DELETE",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/comments/{comment_id}/",
+          "host": ["http://comment:8001"],
+          "method": "DELETE",
+          "encoding": "json",
+          "extra_config": {
+            "plugin/req-resp-modifier": {
+              "name": ["internal-call"],
+              "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+    "endpoint": "/api/gamification/startup/{startup_id}/award-exp",
+    "method": "POST",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/gamification/startup/{startup_id}/award-exp",
+        "host": ["http://gamification:8004"],
+        "method": "POST",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  },
+  {
+    "endpoint": "/api/gamification/investor/{investor_id}/award-exp",
+    "method": "POST",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/gamification/investor/{investor_id}/award-exp",
+        "host": ["http://gamification:8004"],
+        "method": "POST",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  },
+  {
+    "endpoint": "/api/gamification/startup/{startup_id}/experience",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/gamification/startup/{startup_id}/experience",
+        "host": ["http://gamification:8004"],
+        "method": "GET",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  },
+  
+  {
+    "endpoint": "/api/gamification/investor/{investor_id}/experience",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_query_strings": ["*"],
+    "input_headers": ["*"],
+    "backend": [
+      {
+        "url_pattern": "/api/gamification/investor/{investor_id}/experience",
+        "host": ["http://gamification:8004"],
+        "method": "GET",
+        "encoding": "json",
+        "allow": ["*"],
+        "extra_config": {
+          "plugin/req-resp-modifier": {
+            "name": ["internal-call"],
+            "internal-call": {
+                "auth_url": "http://web:8000/api/users/auth/confirm-token/"
+            }
+          }
+        }
+      }
+    ],
+    "extra_config": {
+      "proxy/sequential": true,
+      "proxy/error_handler": {
+        "status_code": 401,
+        "message": "Unauthorized"
+      }
+    }
+  }
+
+  
   ],
   "timeout": "3s",
   "cache_ttl": "300s",

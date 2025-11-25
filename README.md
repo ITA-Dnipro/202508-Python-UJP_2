@@ -30,6 +30,28 @@ We are committed to delivering a platform that is not just a marketplace for ide
 <img width="884" height="783" alt="Screenshot_db" src="https://github.com/user-attachments/assets/50575ba4-a772-4625-8ad3-a7343e90cea2" />
 
 
+### Saved Startups Analytics Microservice:
+
+An analytics microservice that provides real-time and historical investment insights for Investors, Startups, and the entire platform, enriching their dashboards with monetary and percentage-based statistics.
+
+Data Storage: PostgreSQL (primary), Redis (cache), optional time-series DB (InfluxDB / TimescaleDB).
+
+Scheduling: Celery or CRON jobs for daily/monthly statistics creation.
+
+Performance: Cached computations for fast response times.
+
+Security: JWT-based authentication, role-based access (Investor/Startup/Admin).
+
+Scalability: Independent analytics engine, stateless API layer.
+
+Data Model: Supports delta comparison and percentage growth tracking.
+
+Retention Policy: 12-month archive for statistics.
+
+**Sequence diagram**
+<img width="1820" height="618" alt="image" src="https://github.com/user-attachments/assets/f76f688b-e32c-4d73-a3dd-7f77bef9f6ee" />
+
+
 ### Comment Micro-Service:
 
 API Gateway: routes, can do rate-limit, auth pass-through.
@@ -68,7 +90,57 @@ MQ: event publishing for notifications, analytics, search index.
 
 **Security:** JWT-authenticated endpoints; actions verified by user ID and role.
 
-<img width="1440" height="1081" alt="micros-Сторінка-2 drawio" src="https://github.com/user-attachments/assets/168624ad-2ae8-4b3f-9fba-b1ced84e1bbc" />
+<img width="1440" height="1081" alt="gamification" src="https://github.com/user-attachments/assets/168624ad-2ae8-4b3f-9fba-b1ced84e1bbc" />
+
+### Investment Micro-Service:
+
+Handles creation and management of investment requests between investors and startup projects.
+
+API: REST endpoint — POST /investments/requests/ (Investor-only).
+
+DB: PostgreSQL for storing investment requests and statuses.
+
+Auth: JWT-based (investor role validation).
+
+Notifications: triggers message to startup owner on new request
+
+**Sequence diagram:**
+
+<img width="940" height="513" alt="sequence-diagram" src="https://github.com/user-attachments/assets/c1c274d6-a685-4152-aed4-679604de557d" />
+
+### Smart Matching Micro-Service:
+
+* **API Gateway (KrakenD):** Routes requests between monolith, and microservice; performs token validation (auth pass-through), rate limiting.
+
+* **Smart Matching Service (FastAPI):** REST API for calculating similarity between startups and investors; accepts profile descriptions, generates embeddings, calculates cosine similarity.
+
+* **Projects & Profiles Service (Monolith):** Provides data on startups and investors for building vectors.
+
+* **Vector DB (Qdrant):** Stores vectors of startup and investor descriptions, performs similarity search (cosine similarity).
+
+* **ML Embedding Model:** Converts text descriptions into numerical vectors (SentenceTransformers / HuggingFace).
+
+* **Redis (optional):** Used as a cache for recent recommendation requests.
+
+**Sequence diagram:**
+
+<img width="1293" height="657" alt="image" src="https://github.com/user-attachments/assets/bfb71513-74f7-45e5-94c1-b08156333767" />
+
+### Community Forum Micro-Service
+
+A dedicated forum microservice that manages all community discussion data. It provides a secure API for topic creation and management, validates user identity via the API gateway, and offers endpoints for browsing content.
+
+**Storage:** PostgreSQL.
+
+**API Gateway:** KrakenD routes public API endpoints.Handles authentication via an internal-call plugin, which validates the user's JWT against the main monolith (web) and injects the user-id into a header.
+
+**API Layer:** REST API (FastAPI) providing full CRUD operations for forum system, including listing, creation, and retrieval.
+
+**Event Publishing:** Uses Redis Pub/Sub to broadcast real-time events for consumption by other microservices.
+
+<img width="2472" height="5628" alt="image" src="https://github.com/user-attachments/assets/6ceb2c6d-80c0-45aa-ade3-182c27f69458" />
+
+
 
 ### Basic Epics
 
