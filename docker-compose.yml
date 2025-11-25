@@ -184,22 +184,6 @@ services:
       - redis
       - db
 
-  gamification:
-    build:
-      context: ./services/Gamification
-      dockerfile: Dockerfile
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8004 --reload
-    container_name: gamification
-    ports:
-      - "8004:8004"
-    volumes:
-      - ./services/Gamification:/app
-    environment:
-      - DATABASE_URL=postgresql://postgres:585662vcxz@db:5432/miniF_db
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: unless-stopped
 
   krakend:
     build: ./MiniF/krakend
