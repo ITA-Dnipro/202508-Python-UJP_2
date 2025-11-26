@@ -16,6 +16,32 @@ services:
     depends_on:
       - db
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"    # AMQP (RabbitMQ)
+      - "15672:15672"  # Web UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  notification-consumer:
+    build: ./MiniF
+    command: python manage.py run_notif_consumer
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: always
+
+
   comment:
     build:
       context: ./services/Comment
@@ -166,3 +192,4 @@ volumes:
   redis_data:
   mongodb_data:
   es_data:
+  rabbitmq_data:
