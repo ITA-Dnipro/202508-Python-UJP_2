@@ -140,7 +140,7 @@ services:
     env_file: ./services/Forum/app/.env
     ports:
       - "8082:8082"
-    
+
   events:
     build:
       context: ./services/Events
@@ -160,7 +160,7 @@ services:
     build:
       context: ./services/Events
       dockerfile: Dockerfile
-    command: celery -A events_app.celery_app worker -l info 
+    command: celery -A events_app.celery_app worker -l info
     volumes:
       - ./services/Events:/app
     working_dir: /app
@@ -168,9 +168,9 @@ services:
       - ./services/Events/.env.example
     depends_on:
       - redis
-      - db 
+      - db
 
-  events-celery-beat: 
+  events-celery-beat:
     build:
       context: ./services/Events
       dockerfile: Dockerfile
@@ -200,6 +200,7 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
+
 
   krakend:
     build: ./MiniF/krakend
@@ -239,7 +240,7 @@ services:
     volumes:
       - ./services/Smartmatching/app:/app/app
       - ./models_cache:/app/cache
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8003 --reload
+    command: ./run.sh
 
 
 volumes:
