@@ -4,7 +4,6 @@ from django.http import JsonResponse
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from users.permissions import _get_role_from_request
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
@@ -22,6 +21,7 @@ from .serializers import StartupDocumentSerializer
 from notifications.models import Notification, NotificationType
 from profiles.models import InvestorProfile, SavedProject
 from core.tasks import publish_event_task
+from users.permissions import _get_role_from_request
 
 logger = logging.getLogger(__name__)
 
