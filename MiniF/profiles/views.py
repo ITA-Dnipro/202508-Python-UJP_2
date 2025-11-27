@@ -1,4 +1,5 @@
 import logging
+from django.conf import settings
 from django.db import IntegrityError
 from django.db.models import F
 from django.forms import ValidationError
@@ -15,7 +16,7 @@ from django_elasticsearch_dsl_drf.filter_backends import (
     SearchFilterBackend,
 )
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
-from users.permissions import IsInvestorRole
+from users.permissions import IsInvestorRole, _get_role_from_request
 from projects.models import StartupProject
 from .models import StartupProfile, InvestorProfile, Industry, SavedProject
 from .documents import StartupDocument
@@ -30,6 +31,7 @@ from .serializers import (
     SavedProjectSerializer,
     StartupDocumentSerializer,
 )
+from core.tasks import publish_event_task
 
 
 logger = logging.getLogger(__name__)
@@ -79,6 +81,22 @@ class StartupProfileViewSet(viewsets.ModelViewSet):
             qs = qs.filter(location__iexact=location)
 
         return qs
+    
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        
+        profile_id = response.data['id']
+        profile = StartupProfile.objects.get(id=profile_id)
+        
+        routing_key = 'startup.profile.complete'
+
+        user_id = profile.user_id.id
+        role = "startup"
+        message_body = f'{{"user_id": {user_id}, "reference_id": "{profile.id}", "role": "{role}"}}'
+        
+        publish_event_task.delay(settings.RABBITMQ_EXCHANGE, routing_key, message_body)
+
+        return response
 
 
 class InvestorProfileViewSet(viewsets.ModelViewSet):
@@ -100,6 +118,22 @@ class InvestorProfileViewSet(viewsets.ModelViewSet):
         if InvestorProfile.objects.filter(user_id=user).exists():
             raise ValidationError({"detail": "Investor profile already exists."})
         serializer.save()
+    
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        
+        profile_id = response.data['id']
+        profile = InvestorProfile.objects.get(id=profile_id)
+        
+        routing_key = 'investor.profile.complete'
+
+        user_id = profile.user_id.id
+        role = "investor"
+        message_body = f'{{"user_id": {user_id}, "reference_id": "{profile.id}", "role": "{role}"}}'
+        
+        publish_event_task.delay(settings.RABBITMQ_EXCHANGE, routing_key, message_body)
+
+        return response
 
 
 def startup_list(request):
@@ -162,6 +196,15 @@ class SaveProjectView(APIView):
             project.likes = F("likes") + 1
             project.save(update_fields=["likes"])
             project.refresh_from_db()
+
+            routing_key = 'received.like'
+            
+            target_user_id = project.startup_profile_id.user_id.id
+            role = "startup"
+            message_body = f'{{"user_id": {target_user_id}, "reference_id": "{project.id}", "role": "{role}"}}'
+            
+            publish_event_task.delay(settings.RABBITMQ_EXCHANGE, routing_key, message_body)
+
         except IntegrityError:
             return Response({"detail": "Project already saved"}, status=status.HTTP_400_BAD_REQUEST)
 

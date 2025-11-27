@@ -127,7 +127,7 @@ services:
     env_file:
       ./MiniF/.env
     environment:
-      - PYTHONPATH=/app:/app/MiniF
+      - PYTHONPATH=/app
     depends_on:
       - redis
       - web
@@ -196,10 +196,22 @@ services:
       - ./services/Gamification:/app
     environment:
       - DATABASE_URL=postgresql://postgres:585662vcxz@db:5432/miniF_db
+    env_file:
+      - ./services/Gamification/.env
     depends_on:
       db:
         condition: service_healthy
     restart: unless-stopped
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
 
 
   krakend:
@@ -217,6 +229,7 @@ services:
       - comment
       - events
       - gamification
+      - rabbitmq
     environment:
       - KRAKEND_PORT=8080
       - KRAKEND_PLUGINS_ENABLED=true

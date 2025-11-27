@@ -1,4 +1,5 @@
 import logging
+from django.conf import settings
 from django.http import JsonResponse
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
@@ -20,6 +21,8 @@ from .documents import StartupDocument
 from .serializers import StartupDocumentSerializer
 from notifications.models import Notification, NotificationType
 from profiles.models import InvestorProfile, SavedProject
+from core.tasks import publish_event_task
+from users.permissions import _get_role_from_request
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +91,24 @@ class StartupProjectViewSet(viewsets.ModelViewSet):
         if startup_id:
             qs = qs.filter(startup_profile_id=startup_id)
         return qs
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        
+        project_id = response.data['id']
+        project = StartupProject.objects.get(id=project_id)
+        
+        routing_key = 'project.created'
+        if StartupProject.objects.filter(startup_profile_id=project.startup_profile_id).count() == 1:
+            routing_key = 'first.project.created'
+
+        user_id = project.startup_profile_id.user_id.id
+        role = _get_role_from_request(request)
+        message_body = f'{{"user_id": {user_id}, "reference_id": "{project.id}", "role": "{role}"}}'
+        
+        publish_event_task.delay(settings.RABBITMQ_EXCHANGE, routing_key, message_body)
+
+        return response
 
     def update(self, request, *args, **kwargs):
         """
