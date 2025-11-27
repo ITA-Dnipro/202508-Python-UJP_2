@@ -27,13 +27,13 @@ class StartupProjectModelTest(TestCase):
     def test_project_creation(self):
         """Test StartupProject creation"""
         project = StartupProject.objects.create(
-            startup_profile_id=self.profile, 
+            startup_profile=self.profile, 
             title="Test Project", 
             description="Project description", 
             status="Active"
         )
         self.assertEqual(project.title, "Test Project")
-        self.assertEqual(project.startup_profile_id, self.profile)
+        self.assertEqual(project.startup_profile, self.profile)
         self.assertEqual(project.likes, 0)
         self.assertEqual(project.status, "Active")
         self.assertIsNotNone(project.created_at)
@@ -44,7 +44,7 @@ class StartupProjectModelTest(TestCase):
     def test_str_method(self):
         """Test string representation"""
         project = StartupProject.objects.create(
-            startup_profile_id=self.profile,
+            startup_profile=self.profile,
             title="Test Project",
             description="Project description",
             status="Active"

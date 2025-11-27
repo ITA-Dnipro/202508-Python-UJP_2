@@ -10,7 +10,7 @@ class StartupProject(models.Model):
     - Added default=0 to the likes field.
     """
 
-    startup_profile_id = models.ForeignKey("profiles.StartupProfile", on_delete=models.CASCADE)
+    startup_profile = models.ForeignKey("profiles.StartupProfile", on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     likes = models.IntegerField(default=0)
     description = models.TextField()

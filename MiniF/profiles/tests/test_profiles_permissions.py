@@ -36,7 +36,7 @@ class TestInvestorPermissions(APITestCase):
         )
 
         self.project = StartupProject.objects.create(
-            startup_profile_id=self.startup_profile,
+            startup_profile=self.startup_profile,
             title='Test Project Title', 
             description='description',
             status='In progress'

@@ -34,7 +34,7 @@ class StartupProjectAPITest(APITestCase):
     def test_create_project(self):
         """Test creating a new startup project via API."""
         data = {
-            "startup_profile_id": self.startup.id,
+            "startup_profile": self.startup.id,
             "title": "Project Alpha",
             "description": "Project description",
             "status": "Active",
@@ -46,7 +46,7 @@ class StartupProjectAPITest(APITestCase):
     def test_get_project_list(self):
         """Test retrieving a list of all startup projects."""
         StartupProject.objects.create(
-            startup_profile_id=self.startup,
+            startup_profile=self.startup,
             title="Project Beta",
             description="Another project",
             status="Active",
@@ -58,7 +58,7 @@ class StartupProjectAPITest(APITestCase):
     def test_get_project_detail(self):
         """Test retrieving the details of a specific startup project."""
         project = StartupProject.objects.create(
-            startup_profile_id=self.startup,
+            startup_profile=self.startup,
             title="Project Gamma",
             description="Gamma project",
             status="Inactive",
@@ -70,13 +70,13 @@ class StartupProjectAPITest(APITestCase):
     def test_update_project(self):
         """Test updating a startup project's data."""
         project = StartupProject.objects.create(
-            startup_profile_id=self.startup,
+            startup_profile=self.startup,
             title="Project Delta",
             description="Delta project",
             status="Active",
         )
         data = {
-            "startup_profile_id": self.startup.id,
+            "startup_profile": self.startup.id,
             "title": "Project Delta Updated",
             "description": "Updated description",
             "status": "Completed",
@@ -88,7 +88,7 @@ class StartupProjectAPITest(APITestCase):
     def test_delete_project(self):
         """Test deleting a startup project."""
         project = StartupProject.objects.create(
-            startup_profile_id=self.startup,
+            startup_profile=self.startup,
             title="Project Epsilon",
             description="Epsilon project",
             status="Active",

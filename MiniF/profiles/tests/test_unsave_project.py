@@ -21,7 +21,7 @@ class TestUnsaveProject(APITestCase):
             location='Kyiv'
         )
         self.project = StartupProject.objects.create(
-            startup_profile_id=self.startup_profile,
+            startup_profile=self.startup_profile,
             title='Test Project Title', 
             description="A test project",
             status='Concept',
