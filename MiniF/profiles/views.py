@@ -1,5 +1,4 @@
 import logging
-import pika
 from django.conf import settings
 from django.db import IntegrityError
 from django.db.models import F
@@ -32,6 +31,7 @@ from .serializers import (
     SavedProjectSerializer,
     StartupDocumentSerializer,
 )
+from core.tasks import publish_event_task
 
 
 logger = logging.getLogger(__name__)
@@ -88,44 +88,13 @@ class StartupProfileViewSet(viewsets.ModelViewSet):
         profile_id = response.data['id']
         profile = StartupProfile.objects.get(id=profile_id)
         
-        logger.info(f"Attempting to connect to RabbitMQ at {settings.RABBITMQ_HOST}")
-        logger.info(f"Using exchange: {settings.RABBITMQ_EXCHANGE}, queue: {settings.RABBITMQ_QUEUE_GAMIFICATION}")
-        
-        connection = None
-        try:
-            connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=settings.RABBITMQ_HOST)
-            )
-            logger.info("RabbitMQ connection established")
-            
-            channel = connection.channel()
-            
-            channel.exchange_declare(exchange=settings.RABBITMQ_EXCHANGE, exchange_type='topic', durable=True)
-            
-            routing_key = 'startup.profile.complete'
+        routing_key = 'startup.profile.complete'
 
-            user_id = profile.user_id.id
-            role = "startup"
-            message_body = f'{{"user_id": {user_id}, "reference_id": "{profile.id}", "role": "{role}"}}'
-            logger.info(f"Message body: {message_body}")
-            
-            channel.basic_publish(
-                exchange=settings.RABBITMQ_EXCHANGE,
-                routing_key=routing_key,
-                body=message_body,
-                properties=pika.BasicProperties(
-                    delivery_mode=pika.DeliveryMode.Persistent
-                )
-            )
-            
-            logger.info(f"Published {routing_key} event for user {user_id}, profile {profile.id}")
-            
-        except pika.exceptions.AMQPConnectionError as e:
-            logger.error(f"RabbitMQ connection error: {e}")
-        except pika.exceptions.AMQPChannelError as e:
-            logger.error(f"RabbitMQ channel error: {e}")
-        except Exception as e:
-            logger.error(f"Failed to publish RabbitMQ message: {e}")
+        user_id = profile.user_id.id
+        role = "startup"
+        message_body = f'{{"user_id": {user_id}, "reference_id": "{profile.id}", "role": "{role}"}}'
+        
+        publish_event_task.delay(settings.RABBITMQ_EXCHANGE, routing_key, message_body)
 
         return response
 
@@ -156,44 +125,13 @@ class InvestorProfileViewSet(viewsets.ModelViewSet):
         profile_id = response.data['id']
         profile = InvestorProfile.objects.get(id=profile_id)
         
-        logger.info(f"Attempting to connect to RabbitMQ at {settings.RABBITMQ_HOST}")
-        logger.info(f"Using exchange: {settings.RABBITMQ_EXCHANGE}, queue: {settings.RABBITMQ_QUEUE_GAMIFICATION}")
-        
-        connection = None
-        try:
-            connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=settings.RABBITMQ_HOST)
-            )
-            logger.info("RabbitMQ connection established")
-            
-            channel = connection.channel()
-            
-            channel.exchange_declare(exchange=settings.RABBITMQ_EXCHANGE, exchange_type='topic', durable=True)
-            
-            routing_key = 'investor.profile.complete'
+        routing_key = 'investor.profile.complete'
 
-            user_id = profile.user_id.id
-            role = "investor"
-            message_body = f'{{"user_id": {user_id}, "reference_id": "{profile.id}", "role": "{role}"}}'
-            logger.info(f"Message body: {message_body}")
-            
-            channel.basic_publish(
-                exchange=settings.RABBITMQ_EXCHANGE,
-                routing_key=routing_key,
-                body=message_body,
-                properties=pika.BasicProperties(
-                    delivery_mode=pika.DeliveryMode.Persistent
-                )
-            )
-            
-            logger.info(f"Published {routing_key} event for user {user_id}, profile {profile.id}")
-            
-        except pika.exceptions.AMQPConnectionError as e:
-            logger.error(f"RabbitMQ connection error: {e}")
-        except pika.exceptions.AMQPChannelError as e:
-            logger.error(f"RabbitMQ channel error: {e}")
-        except Exception as e:
-            logger.error(f"Failed to publish RabbitMQ message: {e}")
+        user_id = profile.user_id.id
+        role = "investor"
+        message_body = f'{{"user_id": {user_id}, "reference_id": "{profile.id}", "role": "{role}"}}'
+        
+        publish_event_task.delay(settings.RABBITMQ_EXCHANGE, routing_key, message_body)
 
         return response
 
@@ -259,32 +197,13 @@ class SaveProjectView(APIView):
             project.save(update_fields=["likes"])
             project.refresh_from_db()
 
-            try:
-                connection = pika.BlockingConnection(
-                    pika.ConnectionParameters(host=settings.RABBITMQ_HOST)
-                )
-                channel = connection.channel()
-                
-                channel.exchange_declare(exchange=settings.RABBITMQ_EXCHANGE, exchange_type='topic', durable=True)
-                
-                routing_key = 'received.like'
-                
-                target_user_id = project.startup_profile_id.user_id.id
-                role = "startup"
-                message_body = f'{{"user_id": {target_user_id}, "reference_id": "{project.id}", "role": "{role}"}}'
-                
-                channel.basic_publish(
-                    exchange=settings.RABBITMQ_EXCHANGE,
-                    routing_key=routing_key,
-                    body=message_body,
-                    properties=pika.BasicProperties(
-                        delivery_mode=pika.DeliveryMode.Persistent
-                    )
-                )
-                logger.info(f"Published {routing_key} event for user {target_user_id}, project {project.id}")
-                connection.close()
-            except Exception as e:
-                logger.error(f"Failed to publish RabbitMQ message: {e}")
+            routing_key = 'received.like'
+            
+            target_user_id = project.startup_profile_id.user_id.id
+            role = "startup"
+            message_body = f'{{"user_id": {target_user_id}, "reference_id": "{project.id}", "role": "{role}"}}'
+            
+            publish_event_task.delay(settings.RABBITMQ_EXCHANGE, routing_key, message_body)
 
         except IntegrityError:
             return Response({"detail": "Project already saved"}, status=status.HTTP_400_BAD_REQUEST)

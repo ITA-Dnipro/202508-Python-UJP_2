@@ -1,5 +1,4 @@
 import logging
-import pika
 import json
 from django.conf import settings
 from django.http import JsonResponse
@@ -16,6 +15,7 @@ from .serializers import (
     CustomLoginSerializer,
     PasswordResetConfirmSerializer,
 )
+from core.tasks import publish_event_task
 
 logger = logging.getLogger(__name__)
 
@@ -54,38 +54,15 @@ class CustomLoginView(APIView):
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
     def publish_daily_login_event(self, user, role):
-        logger.info(f"Attempting to connect to RabbitMQ at {settings.RABBITMQ_HOST}")
+        routing_key = 'daily.login'
         
-        try:
-            connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=settings.RABBITMQ_HOST)
-            )
-            channel = connection.channel()
-            
-            channel.exchange_declare(exchange=settings.RABBITMQ_EXCHANGE, exchange_type='topic', durable=True)
-            
-            routing_key = 'daily.login'
-            
-            message_body = json.dumps({
-                "user_id": user.id,
-                "reference_id": None,
-                "role": role
-            })
-            
-            channel.basic_publish(
-                exchange=settings.RABBITMQ_EXCHANGE,
-                routing_key=routing_key,
-                body=message_body,
-                properties=pika.BasicProperties(
-                    delivery_mode=pika.DeliveryMode.Persistent
-                )
-            )
-            
-            logger.info(f"Published {routing_key} event for user {user.id}")
-            connection.close()
-            
-        except Exception as e:
-            logger.error(f"Failed to publish RabbitMQ message: {e}")
+        message_body = json.dumps({
+            "user_id": user.id,
+            "reference_id": None,
+            "role": role
+        })
+        
+        publish_event_task.delay(settings.RABBITMQ_EXCHANGE, routing_key, message_body)
 
 
 def test_user(request):
