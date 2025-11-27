@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import ReadOnlyModelViewSet
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
@@ -139,3 +140,7 @@ class StartupProjectViewSet(viewsets.ModelViewSet):
         Notification.objects.bulk_create(notifications)
 
         return response
+
+class InternalStartupViewSet(ReadOnlyModelViewSet):
+    queryset = StartupProject.objects.all()
+    serializer_class = StartupProjectSerializer
